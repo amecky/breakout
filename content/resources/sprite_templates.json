@@ -1,0 +1,30 @@
+sprite { 
+    name : "player"
+    texture_id : 0
+    position : 640,360
+    rect : 60,0,150,50
+    scale : 1,1
+    rotation : 0
+    color : 255,255,255,255
+    type : 2
+}
+sprite { 
+    name : "ball"
+    texture_id : 0
+    position : 640,360
+    rect : 0,160,24,24
+    scale : 1,1
+    rotation : 0
+    color : 255,255,255,255
+    type : 1
+}
+sprite { 
+    name : "cursor"
+    texture_id : 0
+    position : 512,384
+    rect : 0,200,32,32
+    scale : 1,1
+    rotation : 0
+    color : 255,255,255,255
+    type : 0
+}

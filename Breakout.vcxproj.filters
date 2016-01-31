@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\Breakout.cpp" />
+    <ClCompile Include="src\states\MainGameState.cpp">
+      <Filter>states</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="src\Breakout.h" />
+    <ClInclude Include="src\states\MainGameState.h">
+      <Filter>states</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameContext.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Breakout.manifest" />
+    <None Include="content\engine_settings.json">
+      <Filter>content</Filter>
+    </None>
+    <None Include="content\resources\sprite_templates.json">
+      <Filter>content\resources</Filter>
+    </None>
+    <None Include="content\resources\xscale.json">
+      <Filter>content\resources</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Breakout.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="states">
+      <UniqueIdentifier>{3e6ec588-e7f4-4e1d-b390-e51ee77552b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="content">
+      <UniqueIdentifier>{210f27a3-ef79-4fc7-8c35-ab71dcf4dcd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="content\resources">
+      <UniqueIdentifier>{d8fb6b15-cb6d-4a59-bcf9-3a44abd65b8d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
