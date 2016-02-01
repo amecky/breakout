@@ -13,9 +13,9 @@ Grid::~Grid() {
 }
 
 void Grid::buildLevel(int level) {
-	for (int y = 0; y < 5; ++y) {
+	for (int y = 0; y < 8; ++y) {
 		for (int x = 0; x < 10; ++x) {
-			v2 p = v2(10 + x * 90, 400 + y * 40);
+			v2 p = v2(500 + x * 40, 150 + y * 70);
 			ds::SID sid = _world->create(p, "brick");
 			_world->attachBoxCollider(sid, OT_BRICK, 0);
 			Brick* data = (Brick*)_world->attach_data(sid, sizeof(Brick));

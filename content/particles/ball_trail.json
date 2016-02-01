@@ -1,9 +1,9 @@
 particlesystem { 
     max : 1024
     texture_id : 0
-    texture_rect : 20,160,12,12
+    texture_rect : 40,160,20,20
     emitter { 
-        count : 6
+        count : 4
         ejection_period : 0
         ejection_variance : 0
         ejection_counter : 0

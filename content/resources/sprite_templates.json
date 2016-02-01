@@ -2,7 +2,7 @@ sprite {
     name : "player"
     texture_id : 0
     position : 640,360
-    rect : 60,0,90,30
+    rect : 0,120,30,100
     scale : 1,1
     rotation : 0
     color : 255,255,255,255
@@ -15,7 +15,7 @@ sprite {
     rect : 0,160,18,18
     scale : 1,1
     rotation : 0
-    color : 255,255,255,255
+    color : 162,221,247,255
     type : 2
 }
 sprite { 
@@ -32,10 +32,10 @@ sprite {
     name : "brick"
     texture_id : 0
     position : 512,384
-    rect : 100,0,80,30
+    rect : 0,0,30,60
     scale : 1,1
     rotation : 0
-    color : 207,70,71,255
+    color : 235,123,89,255
     type : 3
 }
 sprite { 

@@ -31,4 +31,16 @@ init_actions {
 	load_sprite_templates : true
 	initialize_editor : true
 }
-
+shaders {
+	background {
+		file : "background"
+		tech : "BackgroundTech"
+	}
+}
+descriptors {
+	background_gradient {
+		texture : "TextureArray" 
+		blend_state : "default"
+		shader : "background"
+	}
+}
