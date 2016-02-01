@@ -2,6 +2,7 @@
 #include <base\GameState.h>
 #include "..\Breakout.h"
 #include "..\GameContext.h"
+#include "..\Grid.h"
 
 class MainGameState : public ds::GameState {
 
@@ -14,7 +15,9 @@ public:
 	void render();
 	void activate();
 	int onButtonUp(int button, int x, int y);
+	int onChar(int ascii);
 private:
+	void setSticky();
 	GameContext* _context;
 	ds::World* _world;
 	v2 _cursor_pos;
@@ -22,5 +25,6 @@ private:
 	ds::SID _ball_id;
 	bool _sticky;
 	ds::Vector2fPath _scalePath;
+	Grid* _grid;
 };
 

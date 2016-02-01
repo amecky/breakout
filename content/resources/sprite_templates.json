@@ -2,21 +2,21 @@ sprite {
     name : "player"
     texture_id : 0
     position : 640,360
-    rect : 60,0,150,50
+    rect : 60,0,90,30
     scale : 1,1
     rotation : 0
     color : 255,255,255,255
-    type : 2
+    type : 1
 }
 sprite { 
     name : "ball"
     texture_id : 0
     position : 640,360
-    rect : 0,160,24,24
+    rect : 0,160,18,18
     scale : 1,1
     rotation : 0
     color : 255,255,255,255
-    type : 1
+    type : 2
 }
 sprite { 
     name : "cursor"
@@ -27,4 +27,24 @@ sprite {
     rotation : 0
     color : 255,255,255,255
     type : 0
+}
+sprite { 
+    name : "brick"
+    texture_id : 0
+    position : 512,384
+    rect : 100,0,80,30
+    scale : 1,1
+    rotation : 0
+    color : 207,70,71,255
+    type : 3
+}
+sprite { 
+    name : "background"
+    texture_id : 0
+    position : 512,384
+    rect : 0,512,512,384
+    scale : 2,2
+    rotation : 0
+    color : 255,255,255,255
+    type : 666
 }

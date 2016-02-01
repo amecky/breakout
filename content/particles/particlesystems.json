@@ -1,0 +1,12 @@
+explosion {
+	file : "explosion" 
+	id : 0
+}
+ball_trail {
+	file : "ball_trail"
+	id : 1
+}
+emitter_explosion {
+	file : "emitter_explosion" 
+	id : 2
+}

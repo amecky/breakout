@@ -10,6 +10,7 @@ Breakout::Breakout() : ds::BaseApp() {
 }
 
 Breakout::~Breakout() {
+	delete _context->trails;
 	delete _context;
 }
 // -------------------------------------------------------
@@ -18,6 +19,8 @@ Breakout::~Breakout() {
 bool Breakout::loadContent() {	
 	_context = new GameContext();
 	_context->world = world;
+	_context->particles = particles;
+	_context->trails = new ds::Trails(world,particles);
 	world->setBoundingRect(ds::Rect(40, 40, 940, 700));
 	const char* lvl = 
 		"1111222233"
