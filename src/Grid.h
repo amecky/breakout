@@ -13,6 +13,7 @@ public:
 	~Grid();
 	void buildLevel(int level);
 	int handleHit(ds::SID sid);
+	void clear();
 private:
 	GameContext* _context;
 	ds::World* _world;

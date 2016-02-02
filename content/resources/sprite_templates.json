@@ -2,17 +2,17 @@ sprite {
     name : "player"
     texture_id : 0
     position : 640,360
-    rect : 0,120,30,100
+    rect : 0,0,100,20
     scale : 1,1
     rotation : 0
-    color : 255,255,255,255
+    color : 229,221,203,255
     type : 1
 }
 sprite { 
     name : "ball"
     texture_id : 0
     position : 640,360
-    rect : 0,160,18,18
+    rect : 0,0,18,18
     scale : 1,1
     rotation : 0
     color : 162,221,247,255
@@ -32,7 +32,7 @@ sprite {
     name : "brick"
     texture_id : 0
     position : 512,384
-    rect : 0,0,30,60
+    rect : 0,0,60,30
     scale : 1,1
     rotation : 0
     color : 235,123,89,255
@@ -47,4 +47,24 @@ sprite {
     rotation : 0
     color : 255,255,255,255
     type : 666
+}
+sprite { 
+    name : "side_wall"
+    texture_id : 0
+    position : 512,384
+    rect : 0,0,6,20
+    scale : 1,1
+    rotation : 0
+    color : 255,255,255,255
+    type : 4
+}
+sprite { 
+    name : "top_wall"
+    texture_id : 0
+    position : 512,384
+    rect : 0,0,20,6
+    scale : 1,1
+    rotation : 0
+    color : 255,255,255,255
+    type : 5
 }

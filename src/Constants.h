@@ -12,6 +12,8 @@ enum ObjectTypes {
 	OT_PLAYER,
 	OT_BALL,
 	OT_BRICK,
+	OT_SIDE_WALL,
+	OT_TOP_WALL,
 	OT_EOL
 };
 

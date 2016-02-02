@@ -17,6 +17,7 @@ public:
 	int onButtonUp(int button, int x, int y);
 	int onChar(int ascii);
 private:
+	void restart();
 	void setSticky();
 	GameContext* _context;
 	ds::World* _world;
@@ -26,5 +27,9 @@ private:
 	bool _sticky;
 	ds::Vector2fPath _scalePath;
 	Grid* _grid;
+	v2 _panelPosition;
+	bool _showPanel;
+	float _delta;
+	int _type;
 };
 

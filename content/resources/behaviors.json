@@ -1,0 +1,15 @@
+wiggle_brick {
+	scale_by_path {
+		path : 0.0,1.0,1.0,1.0,0.2,0.2
+	}
+}
+ball_impact {
+	flash_color {
+		start_color : 255,255,255,255
+		end_color : 192,192,192,255
+		tweening : 1
+	}
+	scale_by_path {
+		path : 0.0,1.0,1.0,1.0,0.2,0.2
+	}
+}

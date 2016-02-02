@@ -4,7 +4,7 @@ font {
 	char_height : 14
 	grid_height : 21
 	start_x : 0
-	start_y : 125
+	start_y : 300
 	width : 405
 	height : 168
 	padding : 6
