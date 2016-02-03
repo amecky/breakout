@@ -22,6 +22,7 @@ bool Breakout::loadContent() {
 	_context->particles = particles;
 	_context->trails = new ds::Trails(world,particles);
 	world->setBoundingRect(ds::Rect(40, 40, 940, 700));
+	world->loadBehaviors();
 	const char* lvl = 
 		"1111222233"
 		"---1123---"

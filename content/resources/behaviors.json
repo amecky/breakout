@@ -8,6 +8,8 @@ ball_impact {
 		start_color : 255,255,255,255
 		end_color : 192,192,192,255
 		tweening : 1
+		ttl : 0.4
+		mode : 0
 	}
 	scale_by_path {
 		path : 0.0,1.0,1.0,1.0,0.2,0.2
