@@ -2,6 +2,9 @@
 #include <utils\Log.h>
 #include "..\Constants.h"
 #include <math\Bitset.h>
+#include <io\FileRepository.h>
+
+
 
 MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameState") , _context(context) , _world(context->world) {
 	_grid = new Grid(context);
@@ -41,6 +44,31 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_scalePath.add(0.4f, v2(0.4f, 0.4f));
 	_scalePath.add(0.8f, v2(1.8f, 1.8f));
 	_scalePath.add(1.0f, v2(1, 1));
+
+	
+
+	int size = 0;
+	char* l = ds::repository::load("levels\\Level1.txt",&size);
+	int num = 0;
+	const char* p = l;
+	Level level;
+	while (*p != 0) {
+		if (ds::string::isDigit(*p)) {
+			if (*p != '-') {
+				if (num < GRID_SIZE_X * GRID_SIZE_Y) {
+					int type = *p - '0';
+					LOG << "type: " << type;
+					level.grid[num] = type;
+				}
+			}
+			else if (num < GRID_SIZE_X * GRID_SIZE_Y) {
+				level.grid[num] = -1;
+			}
+			++num;
+		}
+		++p;
+	}
+	_levels.push_back(level);
 }
 
 
@@ -57,7 +85,7 @@ void MainGameState::fill(const char* level) {
 
 void MainGameState::activate() {
 	setSticky();
-	_grid->buildLevel(1);
+	_grid->buildLevel(_levels[0]);
 	_showPanel = false;
 	_panelPosition = v2(10, 760);
 	_delta = 0.0f;
@@ -182,7 +210,7 @@ void MainGameState::render() {
 		gui::end();
 	}
 
-	tweening::draw(tweening::get_by_index(_type), ds::math::buildTexture(0, 0, 4, 4), 0.02f, _delta);
+	//tweening::draw(tweening::get_by_index(_type), ds::math::buildTexture(0, 0, 4, 4), 0.02f, _delta);
 }
 
 void MainGameState::setSticky() {

@@ -1,5 +1,14 @@
 #pragma once
 
+const int GRID_SIZE_X = 10;
+const int GRID_SIZE_Y = 8;
+
+struct Level {
+	char name[32];
+	int index;
+	int grid[GRID_SIZE_X * GRID_SIZE_Y];
+};
+
 enum ParticleSystemTypes {
 	PST_EXPLOSION,
 	PST_BALL_TRAIL,

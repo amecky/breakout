@@ -3,8 +3,14 @@
 #include "..\Breakout.h"
 #include "..\GameContext.h"
 #include "..\Grid.h"
+#include "..\Constants.h"
+
+
+
 
 class MainGameState : public ds::GameState {
+
+	
 
 public:
 	MainGameState(GameContext* context);
@@ -31,5 +37,7 @@ private:
 	bool _showPanel;
 	float _delta;
 	int _type;
+	ds::Array<Level> _levels;
+	
 };
 
