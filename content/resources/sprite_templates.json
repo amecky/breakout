@@ -45,7 +45,27 @@ sprite {
     rect : 0,0,60,30
     scale : 1,1
     rotation : 0
-    color : 235,0,0,255
+    color : 207,70,71,255
+    type : 3
+}
+sprite { 
+    name : "blue_brick"
+    texture_id : 0
+    position : 512,384
+    rect : 0,0,60,30
+    scale : 1,1
+    rotation : 0
+    color : 167,197,189,255
+    type : 3
+}
+sprite { 
+    name : "dark_brick"
+    texture_id : 0
+    position : 512,384
+    rect : 0,0,60,30
+    scale : 1,1
+    rotation : 0
+    color : 82,70,86,255
     type : 3
 }
 sprite { 

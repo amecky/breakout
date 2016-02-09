@@ -4,17 +4,17 @@ particlesystem {
 	texture_rect : 20,160,12,12
 	texture_id : 0
 	emitter {
-		count : 32	
+		count : 60	
 		ejection_period : 0
 		ejection_variance : 0
 		ejection_counter : 0
 	}
 	generators {
-		ring_position {
-			radius : 8
-			variance : 7
-			angle_variance : 30
-			step : 0.0
+		box {
+			num_x : 10
+			num_y : 6
+			step_x : 10
+			step_y : 10
 		}
 		radial_velocity {
 			velocity : 40
