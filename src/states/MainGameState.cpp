@@ -3,8 +3,7 @@
 #include "..\Constants.h"
 #include <math\Bitset.h>
 #include <io\FileRepository.h>
-
-
+#include <utils\FileUtils.h>
 
 MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameState") , _context(context) , _world(context->world) {
 	_grid = new Grid(context);
@@ -46,29 +45,10 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_scalePath.add(1.0f, v2(1, 1));
 
 	
-
-	int size = 0;
-	char* l = ds::repository::load("levels\\Level1.txt",&size);
-	int num = 0;
-	const char* p = l;
-	Level level;
-	while (*p != 0) {
-		if (ds::string::isDigit(*p)) {
-			if (*p != '-') {
-				if (num < GRID_SIZE_X * GRID_SIZE_Y) {
-					int type = *p - '0';
-					LOG << "type: " << type;
-					level.grid[num] = type;
-				}
-			}
-			else if (num < GRID_SIZE_X * GRID_SIZE_Y) {
-				level.grid[num] = -1;
-			}
-			++num;
-		}
-		++p;
+	for (int i = 0; i < 10; ++i) {
+		readLevel(i);
 	}
-	_levels.push_back(level);
+	LOG << "Levels: " << _levels.size();
 }
 
 
@@ -226,5 +206,40 @@ int MainGameState::onChar(int ascii) {
 	if (ascii == 'd') {
 		_showPanel = !_showPanel;
 	}
+	if (ascii == 'e') {
+		_world->startBehavior(_ball_id, "ball_impact");
+	}
 	return 0;
+}
+
+
+bool MainGameState::readLevel(int index) {
+	int size = 0;
+	char name[128];
+	sprintf_s(name, 128, "levels\\Level%d.txt", index);
+	if (ds::file::fileExists(name)) {
+		char* l = ds::repository::load(name, &size);
+		int num = 0;
+		const char* p = l;
+		Level level;
+		while (*p != 0) {
+			if (ds::string::isDigit(*p)) {
+				if (*p != '-') {
+					if (num < GRID_SIZE_X * GRID_SIZE_Y) {
+						int type = *p - '0';
+						level.grid[num] = type;
+					}
+				}
+				else if (num < GRID_SIZE_X * GRID_SIZE_Y) {
+					level.grid[num] = -1;
+				}
+				++num;
+			}
+			++p;
+		}
+		delete[] l;
+		_levels.push_back(level);
+		return true;
+	}
+	return false;
 }

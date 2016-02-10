@@ -5,13 +5,15 @@ wiggle_brick {
 }
 ball_impact {
 	flash_color {
-		start_color : 255,255,255,255
-		end_color : 192,192,192,255
+		start_color : 255,0,0,255
+		end_color : 0,0,255,255
 		tweening : 1
-		ttl : 0.4
+		ttl : 1.4
 		mode : 0
 	}
 	scale_by_path {
-		path : 0.0,1.0,1.0,1.0,0.2,0.2
+		path : 0.0,1.0,1.0,0.4,0.7,0.7,0.8,1.4,1.4,1.0,1.0,1.0
+		ttl : 0.4
+		mode : 0
 	}
 }

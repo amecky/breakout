@@ -25,6 +25,7 @@ public:
 private:
 	void restart();
 	void setSticky();
+	bool readLevel(int index);
 	GameContext* _context;
 	ds::World* _world;
 	v2 _cursor_pos;
