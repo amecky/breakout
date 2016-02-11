@@ -119,19 +119,23 @@ int MainGameState::update(float dt) {
 				_world->flashColor(bid, ds::Color(255, 255, 255, 255), ds::Color(192, 0, 0, 255), 0.4f);
 				_world->scaleByPath(bid, &_scalePath, 0.4f);
 				_world->bounce(_ball_id, ds::BD_X, dt);
-				_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
+				//_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
+				_world->startBehavior(_ball_id, "ball_impact");
 			}
 			else if (c.containsType(OT_TOP_WALL) && c.containsType(OT_BALL)) {
 				ds::SID bid = c.getSIDByType(OT_SIDE_WALL);
 				_world->flashColor(bid, ds::Color(255, 255, 255, 255), ds::Color(192, 0, 0, 255), 0.4f);
 				_world->scaleByPath(bid, &_scalePath, 0.4f);
 				_world->bounce(_ball_id, ds::BD_Y, dt);
-				_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
+				//_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
+				_world->startBehavior(_ball_id, "wiggle_scale");
 			}
 			else if (c.containsType(OT_PLAYER) && c.containsType(OT_BALL)) {
 				//LOG << "BOUNCE";
 				_world->bounce(_ball_id, ds::BD_Y, dt);
-				_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
+				//_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
+				_world->startBehavior(_ball_id, "wiggle_scale");
+				_world->startBehavior(_player_id, "wiggle_player");
 			}
 			else if (c.containsType(OT_BALL) && c.containsType(OT_BRICK)) {
 				ds::SID bid = c.getSIDByType(OT_BRICK);

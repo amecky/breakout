@@ -1,6 +1,15 @@
-wiggle_brick {
+wiggle_scale {
 	scale_by_path {
-		path : 0.0,1.0,1.0,1.0,0.2,0.2
+		path : 0.0,1.0,1.0,0.4,0.4,0.4,0.8,1.8,1.8,1.0,1.0,1.0
+		ttl : 0.4
+		mode : 0
+	}
+}
+wiggle_player {
+	scale_by_path {
+		path : 0.0,1.0,1.0,0.4,1.0,0.4,0.8,1.0,1.8,1.0,1.0,1.0
+		ttl : 0.4
+		mode : 0
 	}
 }
 ball_impact {
