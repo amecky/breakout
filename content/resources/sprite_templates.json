@@ -2,7 +2,7 @@ sprite {
     name : "player"
     texture_id : 0
     position : 640,360
-    rect : 0,0,100,20
+    rect : 0,250,120,35
     scale : 1,1
     rotation : 0
     color : 229,221,203,255
@@ -12,7 +12,7 @@ sprite {
     name : "ball"
     texture_id : 0
     position : 640,360
-    rect : 0,0,18,18
+    rect : 60,160,18,18
     scale : 1,1
     rotation : 0
     color : 162,221,247,255
