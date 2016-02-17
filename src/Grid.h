@@ -40,6 +40,7 @@ private:
 struct Brick {
 	int energy;
 	int type;
+
 };
 
 class Grid {
@@ -51,10 +52,15 @@ public:
 	void buildLevel(const Level& level);
 	int handleHit(ds::SID sid);
 	void clear();
+	void moveDown();
+	void createNewLine(int count);
+	void debug();
 private:
 	GameContext* _context;
 	ds::World* _world;
 	ds::Vector2fPath _scalePath;
 	BrickDefinitions _brickDefinitions;
+	ds::SID _board[20][16];
+	int _limit;
 };
 

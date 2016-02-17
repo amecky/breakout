@@ -3,6 +3,11 @@
 const int GRID_SIZE_X = 10;
 const int GRID_SIZE_Y = 8;
 
+const float GSX = 200.0f;
+const float GSY = 120.0f;
+const int GMX = 20;
+const int GMY = 14;
+
 struct Level {
 	char name[32];
 	int index;
@@ -23,6 +28,7 @@ enum ObjectTypes {
 	OT_BRICK,
 	OT_SIDE_WALL,
 	OT_TOP_WALL,
+	OT_NEW_BRICK,
 	OT_EOL
 };
 

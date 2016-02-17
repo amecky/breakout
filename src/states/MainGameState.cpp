@@ -9,20 +9,20 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_grid = new Grid(context);
 	_world->create(v2(512, 384), "background", LT_BACKGROUND);
 	v2 swp = v2(100, 40);
-	for (int i = 0; i < 24; ++i) {
+	for (int i = 0; i < 22; ++i) {
 		ds::SID wall_id = _world->create(swp, "side_wall", LT_BACKGROUND);
 		_world->attachBoxCollider(wall_id, OT_SIDE_WALL, LT_OBJECTS);
 		swp.y += 30;
 	}
 	swp.x = 900.0f;
 	swp.y = 40.0f;
-	for (int i = 0; i < 24; ++i) {
+	for (int i = 0; i < 22; ++i) {
 		ds::SID wall_id = _world->create(swp, "side_wall", LT_BACKGROUND);
 		_world->attachBoxCollider(wall_id, OT_SIDE_WALL, LT_OBJECTS);
 		swp.y += 30;
 	}
 	swp.x = 125.0f;
-	swp.y = 735.0f;
+	swp.y = 675.0f;
 	for (int i = 0; i < 26; ++i) {
 		ds::SID wall_id = _world->create(swp, "top_wall", LT_BACKGROUND);
 		_world->attachBoxCollider(wall_id, OT_TOP_WALL, LT_OBJECTS);
@@ -233,6 +233,12 @@ int MainGameState::onChar(int ascii) {
 		else {
 			_effect->activate();
 		}
+	}
+	if (ascii == 'q') {
+		_grid->moveDown();
+	}
+	if (ascii == 'w') {
+		_grid->createNewLine(3);
 	}
 	return 0;
 }
