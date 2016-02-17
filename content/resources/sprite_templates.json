@@ -2,7 +2,7 @@ sprite {
     name : "player"
     texture_id : 0
     position : 640,360
-    rect : 0,250,120,35
+    rect : 120,240,120,30
     scale : 1,1
     rotation : 0
     color : 229,221,203,255
@@ -32,40 +32,40 @@ sprite {
     name : "brick"
     texture_id : 0
     position : 512,384
-    rect : 0,0,60,30
+    rect : 60,200,60,30
     scale : 1,1
     rotation : 0
-    color : 235,123,89,255
+    color : 255,255,255,255
     type : 3
 }
 sprite { 
     name : "red_brick"
     texture_id : 0
     position : 512,384
-    rect : 0,0,60,30
+    rect : 60,265,60,30
     scale : 1,1
     rotation : 0
-    color : 207,70,71,255
+    color : 255,255,255,255
     type : 3
 }
 sprite { 
     name : "blue_brick"
     texture_id : 0
     position : 512,384
-    rect : 0,0,60,30
+    rect : 60,330,60,30
     scale : 1,1
     rotation : 0
-    color : 167,197,189,255
+    color : 255,255,255,255
     type : 3
 }
 sprite { 
     name : "dark_brick"
     texture_id : 0
     position : 512,384
-    rect : 0,0,60,30
+    rect : 60,395,60,30
     scale : 1,1
     rotation : 0
-    color : 82,70,86,255
+    color : 255,255,255,255
     type : 3
 }
 sprite { 
@@ -97,4 +97,14 @@ sprite {
     rotation : 0
     color : 255,255,255,255
     type : 5
+}
+sprite { 
+    name : "grid"
+    texture_id : 0
+    position : 512,384
+    rect : 480,20,280,240
+    scale : 1,1
+    rotation : 0
+    color : 255,255,255,255
+    type : 11
 }

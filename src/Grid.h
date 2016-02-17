@@ -56,6 +56,7 @@ public:
 	void createNewLine(int count);
 	void debug();
 private:
+	void findLimit();
 	GameContext* _context;
 	ds::World* _world;
 	ds::Vector2fPath _scalePath;

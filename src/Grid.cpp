@@ -108,7 +108,7 @@ void Grid::buildLevel(const Level& level) {
 			_board[x][y] = ds::INVALID_SID;
 		}
 	}
-	for (int y = 4; y < 8; ++y) {
+	for (int y = 0; y < GMY; ++y) {
 		for (int x = 0; x < GRID_SIZE_X; ++x) {
 			int index = x + y * GRID_SIZE_X;
 			_board[x][y] = ds::INVALID_SID;
@@ -126,9 +126,25 @@ void Grid::buildLevel(const Level& level) {
 				}
 			//}
 		}
-		++_limit;
 	}
+	findLimit();
 	debug();
+}
+
+void Grid::findLimit() {
+	int f = -1;
+	for (int y = 0; y < GMY; ++y) {
+		int cnt = 0;
+		for (int x = 0; x < GMX; ++x) {
+			if (_board[x][y] != ds::INVALID_SID) {
+				++cnt;
+			}
+		}
+		if (f == -1 && cnt != 0) {
+			_limit = y;
+		}
+	}
+	LOG << "LIMIT: " << _limit;
 }
 
 int Grid::handleHit(ds::SID sid) {
@@ -138,6 +154,11 @@ int Grid::handleHit(ds::SID sid) {
 			--data->energy;
 			LOG << "sid: " << sid << " energy: " << data->energy;
 			if (data->energy <= 0) {
+				v2 p = _world->getPosition(sid);
+				Vector2i gp;
+				if (convertToGrid(p, &gp)) {
+					_board[gp.x][gp.y] = ds::INVALID_SID;
+				}
 				return 1;
 			}
 			_world->scaleByPath(sid, &_scalePath, 0.2f);
@@ -164,7 +185,6 @@ void Grid::moveDown() {
 	
 	ds::SID ids[256];
 	int num = _world->find_by_type(OT_BRICK, ids, 256);
-	++_limit;
 	Vector2i gp;
 	for (int i = 0; i < num; ++i) {
 		v2 p = _world->getPosition(ids[i]);
@@ -189,19 +209,21 @@ void Grid::moveDown() {
 			if (r == -1 && _board[gp.x][j] != ds::INVALID_SID) {
 				r = j;
 			}
-		}
-		LOG << "p.x " << gp.x << " r " << r;
+		}		
 		r += 1;
 		if (r == -1) {
 			r = _limit;
 		}
+		LOG << "p.x " << gp.x << " r " << r;
 		_board[gp.x][r] = ids[i];
 		_world->setType(ids[i], OT_BRICK);
+		_world->attachBoxCollider(ids[i], OT_BRICK, 0);
 		v2 np;
 		if (convertFromGrid(gp.x, r, &np)) {
 			_world->moveTo(ids[i], p, np, 0.4f, 0, tweening::easeInOutQuad);
 		}
 	}
+	findLimit();
 	debug();
 }
 

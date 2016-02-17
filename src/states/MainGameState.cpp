@@ -7,16 +7,21 @@
 
 MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameState") , _context(context) , _world(context->world) {
 	_grid = new Grid(context);
-	_world->create(v2(512, 384), "background", LT_BACKGROUND);
-	v2 swp = v2(100, 40);
-	for (int i = 0; i < 22; ++i) {
+	_world->create(v2(GSX + 105, GSY + 340 ), "grid", LT_BACKGROUND);
+	_world->create(v2(GSX + 385, GSY + 340), "grid", LT_BACKGROUND);
+	_world->create(v2(GSX + 675, GSY + 340), "grid", LT_BACKGROUND);
+	_world->create(v2(GSX + 105, GSY + 100), "grid", LT_BACKGROUND);
+	_world->create(v2(GSX + 385, GSY + 100), "grid", LT_BACKGROUND);
+	_world->create(v2(GSX + 675, GSY + 100), "grid", LT_BACKGROUND);
+	v2 swp = v2(160, 40);
+	for (int i = 0; i < 21; ++i) {
 		ds::SID wall_id = _world->create(swp, "side_wall", LT_BACKGROUND);
 		_world->attachBoxCollider(wall_id, OT_SIDE_WALL, LT_OBJECTS);
 		swp.y += 30;
 	}
-	swp.x = 900.0f;
+	swp.x = 870.0f;
 	swp.y = 40.0f;
-	for (int i = 0; i < 22; ++i) {
+	for (int i = 0; i < 21; ++i) {
 		ds::SID wall_id = _world->create(swp, "side_wall", LT_BACKGROUND);
 		_world->attachBoxCollider(wall_id, OT_SIDE_WALL, LT_OBJECTS);
 		swp.y += 30;
@@ -234,8 +239,9 @@ int MainGameState::onChar(int ascii) {
 			_effect->activate();
 		}
 	}
-	if (ascii == 'q') {
+	if (ascii == 'q') {		
 		_grid->moveDown();
+		_grid->createNewLine(4);
 	}
 	if (ascii == 'w') {
 		_grid->createNewLine(3);
