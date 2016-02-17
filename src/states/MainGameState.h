@@ -4,9 +4,9 @@
 #include "..\GameContext.h"
 #include "..\Grid.h"
 #include "..\Constants.h"
-
-
-
+#include <effects\RenderEffect.h>
+#include <effects\BloomRenderEffect.h>
+#include <effects\GrayFadeRenderEffect.h>
 
 class MainGameState : public ds::GameState {
 
@@ -39,6 +39,10 @@ private:
 	float _delta;
 	int _type;
 	ds::Array<Level> _levels;
+
+	//ds::GrayScaleEffect* _effect;
+	ds::BloomRenderEffect* _effect;
+	//ds::GrayFadeEffect* _effect;
 	
 };
 

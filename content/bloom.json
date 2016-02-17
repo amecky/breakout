@@ -1,0 +1,8 @@
+settings { 
+    threshold : 0.25
+    intensity : 1.5
+    original_intensity : 1
+    saturation : 1.2
+    original_saturation : 1
+    blur_amount : 4
+}

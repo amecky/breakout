@@ -49,10 +49,16 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 		readLevel(i);
 	}
 	LOG << "Levels: " << _levels.size();
+
+	//_effect = new ds::GrayScaleEffect();
+	_effect = new ds::BloomRenderEffect();
+	//_effect = new ds::GrayFadeEffect();
+	ds::editor::addSettingsEditor("Bloom", _effect->getSettings());
 }
 
 
 MainGameState::~MainGameState(void) {
+	delete _effect;
 	delete _grid;
 }
 
@@ -80,7 +86,7 @@ void MainGameState::restart() {
 
 int MainGameState::onButtonUp(int button, int x, int y) {
 	if (_sticky) {
-		v2 vel = ds::vector::getRadialVelocity(DEGTORAD(45.0f), 400.0f);
+		v2 vel = ds::vector::getRadialVelocity(DEGTORAD(45.0f), 500.0f);
 		_world->moveBy(_ball_id, vel, true);
 		_sticky = false;
 		_context->trails->add(_ball_id, 5.0f, PST_BALL_TRAIL);
@@ -172,14 +178,21 @@ int MainGameState::update(float dt) {
 	if (_delta > 1.0f) {
 		_delta = 1.0f;
 	}
+
+	_effect->tick(dt);
+
 	return 0;
 }
 
 void MainGameState::render() {
+	_effect->start();
 	_world->renderSingleLayer(LT_BACKGROUND);
 	//_world->renderSingleLayer(LT_BORDER);
 	_world->renderSingleLayer(LT_OBJECTS);
+	//_effect->render();
+	//_effect->start();
 	_context->particles->render();
+	_effect->render();
 	int state = 1;
 	if (_showPanel) {
 		gui::start(100, &_panelPosition);
@@ -212,6 +225,14 @@ int MainGameState::onChar(int ascii) {
 	}
 	if (ascii == 'e') {
 		_world->startBehavior(_ball_id, "ball_impact");
+	}
+	if (ascii == 'g') {
+		if (_effect->isActive()) {
+			_effect->deactivate();
+		}
+		else {
+			_effect->activate();
+		}
 	}
 	return 0;
 }
