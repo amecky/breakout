@@ -82,7 +82,7 @@ sprite {
     name : "side_wall"
     texture_id : 0
     position : 512,384
-    rect : 0,0,6,20
+    rect : 0,0,6,34
     scale : 1,1
     rotation : 0
     color : 255,255,255,255
@@ -92,7 +92,7 @@ sprite {
     name : "top_wall"
     texture_id : 0
     position : 512,384
-    rect : 0,0,20,6
+    rect : 0,0,64,6
     scale : 1,1
     rotation : 0
     color : 255,255,255,255

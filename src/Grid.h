@@ -3,6 +3,45 @@
 #include "Constants.h"
 
 // ---------------------------------------
+// level definition
+// ---------------------------------------
+struct LevelDefinition {
+
+	int brickRange;
+	int newBricks;
+	int startRows;
+	int totalRows;
+	float moveDelay;
+
+};
+
+// ---------------------------------------
+// level definitions
+// ---------------------------------------
+class LevelDefinitions : public ds::DataFile {
+
+public:
+	LevelDefinitions() {}
+	~LevelDefinitions() {}
+	bool saveData(ds::JSONWriter& writer) {
+		return true;
+	}
+	bool loadData(const ds::JSONReader& reader);
+	const char* getFileName() const {
+		return "resources\\levels.json";
+	}
+	size_t size() const {
+		return _definitions.size();
+	}
+	const LevelDefinition& get(size_t index) const {
+		return _definitions[index];
+	}
+private:
+	ds::Array<LevelDefinition> _definitions;
+};
+
+
+// ---------------------------------------
 // Brick definition
 // ---------------------------------------
 struct BrickDefinition {
@@ -55,13 +94,20 @@ public:
 	void moveDown();
 	void createNewLine(int count);
 	void debug();
+	void tick(float dt);
 private:
 	void findLimit();
 	GameContext* _context;
 	ds::World* _world;
 	ds::Vector2fPath _scalePath;
 	BrickDefinitions _brickDefinitions;
+	LevelDefinitions _levelDefinitions;
+	LevelDefinition _currentLevel;
 	ds::SID _board[20][16];
 	int _limit;
+
+	int _rowsLeft;
+	float _moveTimer;
+	float _moveDelay;
 };
 

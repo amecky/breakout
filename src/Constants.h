@@ -3,8 +3,8 @@
 const int GRID_SIZE_X = 10;
 const int GRID_SIZE_Y = 8;
 
-const float GSX = 200.0f;
-const float GSY = 200.0f;
+const float GSX = 216.0f;
+const float GSY = 186.0f;
 const int GMX = 20;
 const int GMY = 12;
 

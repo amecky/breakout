@@ -28,10 +28,31 @@ bool convertToGrid(const v2& p, Vector2i* ret) {
 	ret->y = y;
 	return true;
 }
-// ---------------------------------------
-// load cube definitions
-// ---------------------------------------
+
+// -------------------------------------------------------
+// load level definitions
+// -------------------------------------------------------
+bool LevelDefinitions::loadData(const ds::JSONReader& reader) {
+	_definitions.clear();
+	int cats[32];
+	int num = reader.get_categories(cats, 32);
+	for (int i = 0; i < num; ++i) {
+		LevelDefinition def;
+		reader.get_int(cats[i], "brick_range", &def.brickRange);
+		reader.get_int(cats[i], "new_bricks", &def.newBricks);
+		reader.get_int(cats[i], "start_rows", &def.startRows);
+		reader.get_int(cats[i], "total_rows", &def.totalRows);
+		reader.get_float(cats[i], "move_delay", &def.moveDelay);
+		_definitions.push_back(def);
+	}
+	return true;
+}
+
+// -------------------------------------------------------
+// load brick definitions
+// -------------------------------------------------------
 bool BrickDefinitions::loadData(const ds::JSONReader& reader) {
+	_definitions.clear();
 	int cats[32];
 	int num = reader.get_categories(cats, 32);
 	for (int i = 0; i < num; ++i) {
@@ -44,12 +65,16 @@ bool BrickDefinitions::loadData(const ds::JSONReader& reader) {
 	return true;
 }
 
+// -------------------------------------------------------
+// Grid
+// -------------------------------------------------------
 Grid::Grid(GameContext* context) : _context(context), _world(context->world) {
 	_scalePath.add(0.0f, v2(1, 1));
 	_scalePath.add(0.4f, v2(0.7f, 0.7f));
 	_scalePath.add(0.8f, v2(1.2f, 1.2f));
 	_scalePath.add(1.0f, v2(1, 1));
 	_brickDefinitions.load();
+	_levelDefinitions.load();
 }
 
 Grid::~Grid() {
@@ -73,7 +98,7 @@ void Grid::createNewLine(int count) {
 	for (int x = 0; x < 10; ++x) {
 		//LOG << x << " = " << tmp[x];
 		if (tmp[x] != -1) {
-			v2 p = v2(200 + x * 70, 720);
+			v2 p = v2(GSX + x * 70, GSY + 13 * 40);
 			const BrickDefinition& def = _brickDefinitions.get(tmp[x]);
 			ds::SID sid = _world->create(p, def.name);
 			_world->setType(sid, OT_NEW_BRICK);
@@ -85,30 +110,31 @@ void Grid::createNewLine(int count) {
 	}
 }
 
+// -------------------------------------------------------
+// build level
+// -------------------------------------------------------
 void Grid::buildLevel(int level) {
-	for (int y = 0; y < 6; ++y) {
-		for (int x = 0; x < 10; ++x) {
-			v2 p = v2(200 + x * 70, 350 + y * 40);
-			ds::SID sid = _world->create(p, "brick");
-			_world->attachBoxCollider(sid, OT_BRICK, 0);
-			//_world->moveTo(sid, v2(p.x, p.y + 600.0f), p, 1.5f + y * 0.1f, 0, tweening::easeOutBounce);
-			//_world->scaleTo(sid, v2(1.0f, 0.1f), v2(1, 1), 1.5f, 0, tweening::easeOutBounce);
-			Brick* data = (Brick*)_world->attach_data(sid, sizeof(Brick));
-			data->energy = 2;
-			data->type = 1;
+	clear();
+	if (level >= 0 && level < _levelDefinitions.size()) {
+		const LevelDefinition& def = _levelDefinitions.get(level);
+		createNewLine(def.newBricks);
+		for (int i = 0; i < def.startRows; ++i) {			
+			moveDown();
+			createNewLine(def.newBricks);
 		}
+		_rowsLeft = def.totalRows;
+		_moveTimer = 0.0f;
+		_moveDelay = def.moveDelay;
 	}
 }
 
+// -------------------------------------------------------
+// build level
+// -------------------------------------------------------
 void Grid::buildLevel(const Level& level) {
 	v2 p;
-	_limit = 0;
-	for (int x = 0; x < GMX; ++x) {
-		for (int y = 0; y < GMY; ++y) {
-			_board[x][y] = ds::INVALID_SID;
-		}
-	}
-	for (int y = 0; y < GMY; ++y) {
+	clear();
+	for (int y = 8; y < GMY; ++y) {
 		for (int x = 0; x < GRID_SIZE_X; ++x) {
 			int index = x + y * GRID_SIZE_X;
 			_board[x][y] = ds::INVALID_SID;
@@ -127,10 +153,31 @@ void Grid::buildLevel(const Level& level) {
 			//}
 		}
 	}
+	createNewLine(4);
 	findLimit();
 	debug();
 }
 
+// -------------------------------------------------------
+// tick
+// -------------------------------------------------------
+void Grid::tick(float dt) {
+	if (_rowsLeft > 0) {
+		_moveTimer += dt;
+		if (_moveTimer >= _moveDelay) {
+			_moveTimer = 0.0f;
+			moveDown();
+			if (_rowsLeft > 1) {
+				createNewLine(4);
+			}
+			--_rowsLeft;
+		}
+	}
+}
+
+// -------------------------------------------------------
+// find limit
+// -------------------------------------------------------
 void Grid::findLimit() {
 	int f = -1;
 	for (int y = 0; y < GMY; ++y) {
@@ -140,13 +187,20 @@ void Grid::findLimit() {
 				++cnt;
 			}
 		}
-		if (f == -1 && cnt != 0) {
-			_limit = y;
+		if (f == -1 && cnt != 0) {			
+			f = y;
 		}
+	}
+	_limit = f;
+	if (_limit == -1) {
+		_limit = GMY - 1;
 	}
 	LOG << "LIMIT: " << _limit;
 }
 
+// -------------------------------------------------------
+// handle hit
+// -------------------------------------------------------
 int Grid::handleHit(ds::SID sid) {
 	if (_world->contains(sid) && _world->getType(sid) == OT_BRICK) {		
 		Brick* data = (Brick*)_world->get_data(sid);
@@ -167,6 +221,9 @@ int Grid::handleHit(ds::SID sid) {
 	return 0;
 }
 
+// -------------------------------------------------------
+// clear
+// -------------------------------------------------------
 void Grid::clear() {
 	ds::SID ids[256];
 	int num = _world->find_by_type(OT_BRICK, ids, 256);
@@ -177,10 +234,17 @@ void Grid::clear() {
 	for (int i = 0; i < num; ++i) {
 		_world->remove(ids[i]);
 	}
+	_limit = GMY - 1;
+	for (int x = 0; x < GMX; ++x) {
+		for (int y = 0; y < GMY; ++y) {
+			_board[x][y] = ds::INVALID_SID;
+		}
+	}
 }
 
-
-
+// -------------------------------------------------------
+// move down
+// -------------------------------------------------------
 void Grid::moveDown() {
 	
 	ds::SID ids[256];
@@ -195,10 +259,14 @@ void Grid::moveDown() {
 				// game over
 			}
 			else {
+				_world->scaleTo(ids[i], v2(0.7f, 0.7f), v2(1, 1), 0.4f, 0, tweening::easeInOutQuad);
 				_world->moveTo(ids[i], p, v2(p.x, p.y - 40.0f), 0.4f, 0, tweening::easeInOutQuad);
 			}
 		}
 	}
+
+	findLimit();
+
 	num = _world->find_by_type(OT_NEW_BRICK, ids, 256);
 	for (int i = 0; i < num; ++i) {
 		v2 p = _world->getPosition(ids[i]);
@@ -214,6 +282,9 @@ void Grid::moveDown() {
 		if (r == -1) {
 			r = _limit;
 		}
+		if (r < _limit) {
+			r = _limit;
+		}
 		LOG << "p.x " << gp.x << " r " << r;
 		_board[gp.x][r] = ids[i];
 		_world->setType(ids[i], OT_BRICK);
@@ -223,10 +294,13 @@ void Grid::moveDown() {
 			_world->moveTo(ids[i], p, np, 0.4f, 0, tweening::easeInOutQuad);
 		}
 	}
-	findLimit();
+	
 	debug();
 }
 
+// -------------------------------------------------------
+// debug
+// -------------------------------------------------------
 void Grid::debug() {
 	char buffer[32];
 	LOG << "============================================================";

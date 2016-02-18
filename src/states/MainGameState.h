@@ -15,8 +15,6 @@ class MainGameState : public ds::GameState {
 public:
 	MainGameState(GameContext* context);
 	~MainGameState(void);
-	void clear();
-	void fill(const char* level);
 	int update(float dt);
 	void render();
 	void activate();
