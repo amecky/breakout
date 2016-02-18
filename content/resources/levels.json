@@ -1,0 +1,7 @@
+level {
+	brick_range : 2
+	new_bricks : 4
+	start_rows : 1
+	total_rows : 5
+	move_delay : 4
+}

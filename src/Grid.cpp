@@ -162,7 +162,7 @@ void Grid::buildLevel(const Level& level) {
 // tick
 // -------------------------------------------------------
 void Grid::tick(float dt) {
-	if (_rowsLeft > 0) {
+	//if (_rowsLeft > 0) {
 		_moveTimer += dt;
 		if (_moveTimer >= _moveDelay) {
 			_moveTimer = 0.0f;
@@ -170,9 +170,11 @@ void Grid::tick(float dt) {
 			if (_rowsLeft > 1) {
 				createNewLine(4);
 			}
-			--_rowsLeft;
+			if (_rowsLeft > 0) {
+				--_rowsLeft;
+			}
 		}
-	}
+	//}
 }
 
 // -------------------------------------------------------
@@ -295,7 +297,7 @@ void Grid::moveDown() {
 		}
 	}
 	
-	debug();
+	//debug();
 }
 
 // -------------------------------------------------------

@@ -8,13 +8,13 @@
 MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameState") , _context(context) , _world(context->world) {
 	_grid = new Grid(context);
 	_world->create(v2(512, 384), "background");
-	v2 swp = v2(150, 66);
+	v2 swp = v2(140, 66);
 	for (int i = 0; i < 15; ++i) {
 		ds::SID wall_id = _world->create(swp, "side_wall", LT_BACKGROUND);
 		_world->attachBoxCollider(wall_id, OT_SIDE_WALL, LT_OBJECTS);
 		swp.y += 40;
 	}
-	swp.x = 920.0f;
+	swp.x = 890.0f;
 	swp.y = 66.0f;
 	for (int i = 0; i < 15; ++i) {
 		ds::SID wall_id = _world->create(swp, "side_wall", LT_BACKGROUND);
@@ -32,6 +32,8 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_player_id = _world->create(v2(512, 70), "player", LT_OBJECTS);
 	_world->attachBoxCollider(_ball_id, OT_BALL, LT_OBJECTS);
 	_world->attachBoxCollider(_player_id, OT_PLAYER, LT_OBJECTS);
+
+	_world->ignoreCollisions(OT_BRICK, OT_TOP_WALL);
 	//_world->attach_descriptor(LT_BORDER, "background_gradient");
 	//_world->create(v2(512, 700), ds::math::buildTexture(0, 0, 900, 10), 0.0f, 1.0f, 1.0f, ds::Color::WHITE, 666, LT_BORDER);
 	//_world->create(v2(960, 400), ds::math::buildTexture(0, 0, 600, 10), HALF_PI, 1.0f, 1.0f, ds::Color::WHITE, 666, LT_BORDER);
@@ -128,35 +130,63 @@ int MainGameState::update(float dt) {
 	// collisions
 	int numCollisions = _world->getNumCollisions();
 	if (numCollisions > 0) {
+		LOG << "--------------- num: " << numCollisions;
 		for (int i = 0; i < numCollisions; ++i) {
 			ZoneTracker z1("MainGameState:collision");
 			const ds::Collision& c = _world->getCollision(i);
 			if (c.containsType(OT_SIDE_WALL) && c.containsType(OT_BALL)) {
 				ds::SID bid = c.getSIDByType(OT_SIDE_WALL);
-				_world->flashColor(bid, ds::Color(255, 255, 255, 255), ds::Color(192, 0, 0, 255), 0.4f);
-				_world->scaleByPath(bid, &_scalePath, 0.4f);
 				_world->bounce(_ball_id, ds::BD_X, dt);
-				//_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
+				_world->startBehavior(bid, "wall_impact");
 				_world->startBehavior(_ball_id, "ball_impact");
 			}
 			else if (c.containsType(OT_TOP_WALL) && c.containsType(OT_BALL)) {
-				ds::SID bid = c.getSIDByType(OT_SIDE_WALL);
-				_world->flashColor(bid, ds::Color(255, 255, 255, 255), ds::Color(192, 0, 0, 255), 0.4f);
-				_world->scaleByPath(bid, &_scalePath, 0.4f);
+				ds::SID bid = c.getSIDByType(OT_TOP_WALL);
+				_world->startBehavior(bid, "wall_impact");
 				_world->bounce(_ball_id, ds::BD_Y, dt);
-				//_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
-				_world->startBehavior(_ball_id, "wiggle_scale");
+				_world->startBehavior(_ball_id, "ball_impact");
 			}
 			else if (c.containsType(OT_PLAYER) && c.containsType(OT_BALL)) {
-				//LOG << "BOUNCE";
-				_world->bounce(_ball_id, ds::BD_Y, dt);
-				//_world->scaleByPath(_ball_id, &_scalePath, 0.4f);
-				_world->startBehavior(_ball_id, "wiggle_scale");
-				_world->startBehavior(_player_id, "wiggle_player");
+				handleBallPlayerCollision();
 			}
 			else if (c.containsType(OT_BALL) && c.containsType(OT_BRICK)) {
 				ds::SID bid = c.getSIDByType(OT_BRICK);
 				int ret = ds::physics::testLineBox(_world->getPosition(_ball_id), _world->getPosition(bid), v2(60, 30));
+				v2 bp = _world->getPosition(bid);
+				v2 pp = _world->getPosition(_ball_id);
+
+				// http://gamedev.stackexchange.com/questions/29786/a-simple-2d-rectangle-collision-algorithm-that-also-determines-which-sides-that
+				float w = 0.5 * (120.0f + 18.0f);
+				float h = 0.5 * (30.0f + 18.0f);
+				float dx = bp.x - pp.x;
+				float dy = bp.y - pp.y;
+
+				if (abs(dx) <= w && abs(dy) <= h) {
+					/* collision! */
+					float wy = w * dy;
+					float hx = h * dx;
+					LOG << "wy: " << wy << " hx: " << hx;
+					if (wy > hx) {
+						if (wy > -hx) {
+							LOG << "BOTTOM";
+						}
+						else {
+							LOG << "LEFT";
+						}
+					}
+					else {
+						if (wy > -hx) {
+							LOG << "RIGHT";
+						}
+						else {
+							LOG << "TOP";
+						}
+					}
+				}
+
+
+
+				LOG << "RET: " << ret << " brick: " << DBG_V2(bp) << " ball: " << DBG_V2(pp);
 				if (ds::bit::is_set(ret, 0) || ds::bit::is_set(ret, 2)) {
 					_world->bounce(_ball_id, ds::BD_Y, dt);
 				}
@@ -199,6 +229,23 @@ int MainGameState::update(float dt) {
 	_effect->tick(dt);
 
 	return 0;
+}
+
+// -------------------------------------------------------
+// ball player collision
+// -------------------------------------------------------
+void MainGameState::handleBallPlayerCollision() {
+	v2 pp = _world->getPosition(_player_id);
+	v2 bp = _world->getPosition(_ball_id);
+	v2 diff = bp - pp;
+	float xdir = 1.0f + diff.x / 60.0f;
+	float angle = DEGTORAD(135.0f) - xdir * DEGTORAD(45.0f);
+	_world->stopAction(_ball_id, ds::AT_MOVE_BY);
+	_world->moveBy(_ball_id, ds::vector::getRadialVelocity(angle, 500.0f));
+	bp.y = 95.0f;
+	_world->setPosition(_ball_id, bp);
+	_world->startBehavior(_ball_id, "wiggle_scale");
+	_world->startBehavior(_player_id, "wiggle_player");
 }
 
 // -------------------------------------------------------
