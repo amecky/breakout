@@ -88,13 +88,12 @@ public:
 	Grid(GameContext* context);
 	~Grid();
 	void buildLevel(int level);
-	void buildLevel(const Level& level);
 	int handleHit(ds::SID sid);
 	void clear();
-	void moveDown();
+	bool moveDown();
 	void createNewLine(int count);
 	void debug();
-	void tick(float dt);
+	bool tick(float dt);
 private:
 	void findLimit();
 	GameContext* _context;

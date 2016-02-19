@@ -5,16 +5,16 @@ brick {
 }
 brick {
 	type : 2
-	name : "red_brick"
+	name : "blue_brick"
 	energy : 3
 }
 brick {
 	type : 3
-	name : "blue_brick"
+	name : "dark_brick"
 	energy : 4
 }
 brick {
 	type : 4
-	name : "dark_brick"
+	name : "red_brick"
 	energy : 5
 }

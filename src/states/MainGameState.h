@@ -21,9 +21,10 @@ public:
 	int onButtonUp(int button, int x, int y);
 	int onChar(int ascii);
 private:
+	void movePlayer();
+	void handleCollisions(float dt);
 	void restart();
 	void setSticky();
-	bool readLevel(int index);
 	void handleBallPlayerCollision();
 	GameContext* _context;
 	ds::World* _world;
@@ -37,7 +38,6 @@ private:
 	bool _showPanel;
 	float _delta;
 	int _type;
-	ds::Array<Level> _levels;
 
 	//ds::GrayScaleEffect* _effect;
 	ds::BloomRenderEffect* _effect;

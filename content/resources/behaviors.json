@@ -26,6 +26,20 @@ wall_impact {
 		mode : 0
 	}
 }
+top_wall_impact {
+	flash_color {
+		start_color : 64,64,64,255
+		end_color : 192,0,0,255
+		tweening : 1
+		ttl : 0.4
+		mode : 0
+	}
+	scale_by_path {
+		path : 0.0,1.0,1.0,0.4,1.0,0.4,0.8,1.0,1.8,1.0,1.0,1.0
+		ttl : 0.4
+		mode : 0
+	}
+}
 ball_impact {
 	flash_color {
 		start_color : 255,0,0,255

@@ -79,10 +79,20 @@ sprite {
     type : 666
 }
 sprite { 
-    name : "side_wall"
+    name : "right_side_wall"
     texture_id : 0
     position : 512,384
-    rect : 0,0,6,34
+    rect : 184,33,20,34
+    scale : 1,1
+    rotation : 0
+    color : 64,64,64,255
+    type : 7
+}
+sprite { 
+    name : "left_side_wall"
+    texture_id : 0
+    position : 512,384
+    rect : 184,46,20,34
     scale : 1,1
     rotation : 0
     color : 64,64,64,255
@@ -92,10 +102,10 @@ sprite {
     name : "top_wall"
     texture_id : 0
     position : 512,384
-    rect : 0,0,64,6
+    rect : 176,80,64,20
     scale : 1,1
     rotation : 0
-    color : 128,128,128,255
+    color : 64,64,64,255
     type : 5
 }
 sprite { 
