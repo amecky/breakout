@@ -10,19 +10,19 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_world->create(v2(512, 384), "background");
 	v2 swp = LEFT_WALL_POS;
 	for (int i = 0; i < 15; ++i) {
-		ds::SID wall_id = _world->create(swp, "left_side_wall", LT_BACKGROUND);
+		ds::SID wall_id = _world->create(swp, "left_side_wall", LT_BORDER);
 		_world->attachBoxCollider(wall_id, OT_LEFT_WALL, LT_OBJECTS);
 		swp.y += 40;
 	}
 	swp = RIGHT_WALL_POS;
 	for (int i = 0; i < 15; ++i) {
-		ds::SID wall_id = _world->create(swp, "right_side_wall", LT_BACKGROUND);
+		ds::SID wall_id = _world->create(swp, "right_side_wall", LT_BORDER);
 		_world->attachBoxCollider(wall_id, OT_RIGHT_WALL, LT_OBJECTS);
 		swp.y += 40;
 	}
 	swp = TOP_WALL_POS;
 	for (int i = 0; i < 10; ++i) {
-		ds::SID wall_id = _world->create(swp, "top_wall", LT_BACKGROUND);
+		ds::SID wall_id = _world->create(swp, "top_wall", LT_BORDER);
 		_world->attachBoxCollider(wall_id, OT_TOP_WALL, LT_OBJECTS);
 		swp.x += 70;
 	}
@@ -49,9 +49,10 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_scalePath.add(1.0f, v2(1, 1));
 	
 	//_effect = new ds::GrayScaleEffect();
-	_effect = new ds::BloomRenderEffect();
+	//_effect = new ds::BloomRenderEffect();
 	//_effect = new ds::GrayFadeEffect();
-	ds::editor::addSettingsEditor("Bloom", _effect->getSettings());
+	_effect = new ds::AlphaFadeEffect();
+	ds::editor::addSettingsEditor("FX", _effect->getSettings());
 }
 
 // -------------------------------------------------------
@@ -266,10 +267,10 @@ void MainGameState::handleBallPlayerCollision() {
 // -------------------------------------------------------
 // render
 // -------------------------------------------------------
-void MainGameState::render() {
-	_effect->start();
+void MainGameState::render() {	
 	_world->renderSingleLayer(LT_BACKGROUND);
-	//_world->renderSingleLayer(LT_BORDER);
+	_effect->start();
+	_world->renderSingleLayer(LT_BORDER);
 	_world->renderSingleLayer(LT_OBJECTS);
 	//_effect->render();
 	//_effect->start();

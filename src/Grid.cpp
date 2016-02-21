@@ -100,7 +100,7 @@ void Grid::createNewLine(int count) {
 		if (tmp[x] != -1) {
 			v2 p = v2(GSX + x * GDX, GSY + 13 * GDY);
 			const BrickDefinition& def = _brickDefinitions.get(tmp[x]);
-			ds::SID sid = _world->create(p, def.name);
+			ds::SID sid = _world->create(p, def.name, LT_OBJECTS);
 			_world->setType(sid, OT_NEW_BRICK);
 			_world->scaleTo(sid, v2(1.0f, 0.1f), v2(1, 1), 1.5f, 0, tweening::easeOutBounce);
 			Brick* data = (Brick*)_world->attach_data(sid, sizeof(Brick));

@@ -7,6 +7,7 @@
 #include <effects\RenderEffect.h>
 #include <effects\BloomRenderEffect.h>
 #include <effects\GrayFadeRenderEffect.h>
+#include <effects\AlphaFadeRenderEffect.h>
 
 class MainGameState : public ds::GameState {
 
@@ -40,8 +41,9 @@ private:
 	int _type;
 
 	//ds::GrayScaleEffect* _effect;
-	ds::BloomRenderEffect* _effect;
+	//ds::BloomRenderEffect* _effect;
 	//ds::GrayFadeEffect* _effect;
+	ds::AlphaFadeEffect* _effect;
 	
 };
 
