@@ -1,0 +1,5 @@
+grid {
+	ttl : 1.2
+	regular_color : 16,16,16,255
+	flash_color : 64,0,0,255
+}

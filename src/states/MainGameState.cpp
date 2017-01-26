@@ -222,7 +222,11 @@ void MainGameState::handleCollisions(float dt) {
 						}
 					}
 				}
-				_context->world->remove(c.getIDByType(OT_BRICK));
+				Brick* data = (Brick*)_context->world->get_data(c.getIDByType(OT_BRICK));
+				--data->energy;
+				if (data->energy <= 0) {
+					_context->world->remove(c.getIDByType(OT_BRICK));
+				}
 			}
 		}
 	}
