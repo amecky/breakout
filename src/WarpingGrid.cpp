@@ -5,8 +5,8 @@ const float TIME_STEPSIZE2 = 0.95f * 0.95f;
 const v3 DOT_POINTS[] = { v3(-2, 2, 0), v3(2, 2, 0), v3(2, -2, 0), v3(-2, -2, 0) };
 
 WarpingGrid::WarpingGrid(GameSettings* settings) : _settings(settings) {
-	_dotTex = math::buildTexture(40, 120, 4, 4);
-	_lineTex = math::buildTexture(42, 122, 10, 2);
+	_dotTex = math::buildTexture(0, 0, 4, 4);
+	_lineTex = math::buildTexture(2, 2, 10, 2);
 	_squareBuffer = ds::res::find("Squares", ds::ResourceType::SQUAREBUFFER);
 	_useSquares = false;
 }

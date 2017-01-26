@@ -3,6 +3,7 @@
 #include "..\Constants.h"
 #include <core\math\Bitset.h>
 #include <core\io\FileRepository.h>
+#include "..\WarpingGrid.h"
 
 MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameState") , _context(context) , _world(context->world) {
 	_paddle = (Paddle*)ds::game::get_game_object(SID("Paddle"));
@@ -222,6 +223,7 @@ void MainGameState::handleCollisions(float dt) {
 						}
 					}
 				}
+				_context->grid->applyForce(pp.xy(), 0.3f, 5.0f, 40.0f);
 				Brick* data = (Brick*)_context->world->get_data(c.getIDByType(OT_BRICK));
 				--data->energy;
 				if (data->energy <= 0) {

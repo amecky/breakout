@@ -8,6 +8,8 @@
     <ClCompile Include="src\Paddle.cpp" />
     <ClCompile Include="src\Ball.cpp" />
     <ClCompile Include="src\Bricks.cpp" />
+    <ClCompile Include="src\ElasticBorder.cpp" />
+    <ClCompile Include="src\WarpingGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -20,6 +22,9 @@
     <ClInclude Include="src\Paddle.h" />
     <ClInclude Include="src\Ball.h" />
     <ClInclude Include="src\Bricks.h" />
+    <ClInclude Include="src\WarpingGrid.h" />
+    <ClInclude Include="src\ElasticBorder.h" />
+    <ClInclude Include="src\GameSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />
@@ -49,12 +54,6 @@
     </None>
     <None Include="content\resources\brick_definitions.json">
       <Filter>content\resources</Filter>
-    </None>
-    <None Include="content\bloom.json">
-      <Filter>content</Filter>
-    </None>
-    <None Include="content\grayfade.json">
-      <Filter>content</Filter>
     </None>
     <None Include="content\resources\levels.json">
       <Filter>content\resources</Filter>

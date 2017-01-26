@@ -5,6 +5,8 @@
 #include "Paddle.h"
 #include "Ball.h"
 #include "Bricks.h"
+#include "WarpingGrid.h"
+#include "ElasticBorder.h"
 
 ds::BaseApp *app = new Breakout(); 
 
@@ -12,7 +14,8 @@ Breakout::Breakout() : ds::BaseApp() {
 }
 
 Breakout::~Breakout() {
-	//delete _context->trails;
+	delete _context->world;
+	delete _context->settings;
 	delete _context;
 }
 
@@ -38,7 +41,11 @@ bool Breakout::loadContent() {
 	m->texture = ds::res::find("TextureArray", ds::ResourceType::TEXTURE);
 
 	_context = new GameContext();
+	_context->settings = new GameSettings;
+	_context->settings->load();
 	_context->world = new ds::World;
+	_context->grid = new WarpingGrid(_context->settings);
+	_context->grid->createGrid();
 
 	ds::game::add_game_object(new Paddle(_context));
 	ds::game::add_game_object(new Ball(_context));
@@ -73,12 +80,14 @@ void Breakout::releaseBall() {
 // Update
 // -------------------------------------------------------
 void Breakout::update(float dt) {
+	_context->grid->tick(dt);
 }
 
 // -------------------------------------------------------
 // Draw
 // -------------------------------------------------------
 void Breakout::render() {
+	_context->grid->render();
 	ds::SpriteBuffer* sprites = graphics::getSpriteBuffer();
 	ds::ChannelArray* array = _context->world->getChannelArray();
 	v3* positions = (v3*)array->get_ptr(ds::WEC_POSITION);

@@ -226,8 +226,10 @@
     <ClCompile Include="src\Ball.cpp" />
     <ClCompile Include="src\Breakout.cpp" />
     <ClCompile Include="src\Bricks.cpp" />
+    <ClCompile Include="src\ElasticBorder.cpp" />
     <ClCompile Include="src\Paddle.cpp" />
     <ClCompile Include="src\states\MainGameState.cpp" />
+    <ClCompile Include="src\WarpingGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -235,15 +237,16 @@
     <ClInclude Include="src\Breakout.h" />
     <ClInclude Include="src\Bricks.h" />
     <ClInclude Include="src\Constants.h" />
+    <ClInclude Include="src\ElasticBorder.h" />
     <ClInclude Include="src\GameContext.h" />
+    <ClInclude Include="src\GameSettings.h" />
     <ClInclude Include="src\Paddle.h" />
     <ClInclude Include="src\states\MainGameState.h" />
+    <ClInclude Include="src\WarpingGrid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />
-    <None Include="content\bloom.json" />
     <None Include="content\engine_settings.json" />
-    <None Include="content\grayfade.json" />
     <None Include="content\particles\ball_trail.json" />
     <None Include="content\particles\emitter_explosion.json" />
     <None Include="content\particles\explosion.json" />
