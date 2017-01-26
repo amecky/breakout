@@ -1,16 +1,13 @@
 #pragma once
-#include <base\GameState.h>
+#include <gamestates\GameState.h>
 #include "..\Breakout.h"
 #include "..\GameContext.h"
-#include "..\Grid.h"
 #include "..\Constants.h"
-#include <effects\RenderEffect.h>
-#include <effects\BloomRenderEffect.h>
-#include <effects\GrayFadeRenderEffect.h>
+#include "..\Paddle.h"
+#include "..\Ball.h"
+#include "..\Bricks.h"
 
 class MainGameState : public ds::GameState {
-
-	
 
 public:
 	MainGameState(GameContext* context);
@@ -33,14 +30,16 @@ private:
 	ds::SID _ball_id;
 	bool _sticky;
 	ds::Vector2fPath _scalePath;
-	Grid* _grid;
+	//Grid* _grid;
 	v2 _panelPosition;
 	bool _showPanel;
 	float _delta;
 	int _type;
 
+	Paddle* _paddle;
+	Ball* _ball;
+	Bricks* _bricks;
 	//ds::GrayScaleEffect* _effect;
-	ds::BloomRenderEffect* _effect;
 	//ds::GrayFadeEffect* _effect;
 	
 };

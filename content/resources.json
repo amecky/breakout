@@ -1,0 +1,54 @@
+quad_index_buffer {
+	name : "SpriteQuadBuffer"
+	size : 6144
+}
+sampler_state {
+	name : "ClampSamplerState"
+	addressU : "CLAMP"
+	addressV : "CLAMP"
+	addressW : "CLAMP"
+	filter : "LINEAR"
+}
+texture {
+	name : "TextureArray" 
+	file : "TextureArray.png"
+}
+font {
+	name : "nullshock"
+	file : "nullshock.json"
+}
+font {
+	name : "gui_font"
+	file : "gui_font.json"
+}
+dialog {
+    name : "MainMenu"
+    file : "MainMenu"
+    font : "nullshock"
+}
+dialog {
+    name : "GameOver"
+    file : "GameOver"
+    font : "nullshock"
+}
+dialog {
+    name : "Credits"
+    file : "Credits"
+    font : "nullshock"
+}
+script {
+	name : "MoveSomething"
+	file : "test"
+	variables : "DT,MV,AMP"
+}
+script {
+	name : "Wiggle"
+	file : "wiggle"
+	variables : "TIMER,TWO_PI"
+}
+render_target {
+	name : "RT1"
+	width : 1024
+	height : 768
+	clear_color : 0,0,0,0
+}

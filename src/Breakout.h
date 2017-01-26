@@ -1,4 +1,5 @@
-#pragma comment(lib, "Diesel2D.lib")
+#pragma comment(lib, "D11.lib")
+#pragma comment(lib, "DieselCore.lib")
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dsound.lib")
 #pragma comment(lib, "dxerr.lib")
@@ -6,7 +7,6 @@
 
 #pragma once
 #include "base\BaseApp.h"
-#include "dxstdafx.h"
 #include <renderer\render_types.h>
 
 struct GameContext;
@@ -17,12 +17,17 @@ public:
 	Breakout();
 	virtual ~Breakout();
 	bool loadContent();
+	bool initialize() {
+		return true;
+	}
 	const char* getTitle() {
 		return "Breakout";
 	}
 	void update(float dt);
-	void draw();
+	void render();
 	void init();
+protected:
+	void prepare(ds::Settings* settings);
 private:
 	void reset();
 	virtual void OnChar( char ascii,unsigned int keyState );

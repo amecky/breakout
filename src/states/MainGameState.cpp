@@ -1,11 +1,14 @@
 #include "MainGameState.h"
-#include <utils\Log.h>
+#include <core\log\Log.h>
 #include "..\Constants.h"
-#include <math\Bitset.h>
-#include <io\FileRepository.h>
-#include <utils\FileUtils.h>
+#include <core\math\Bitset.h>
+#include <core\io\FileRepository.h>
 
 MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameState") , _context(context) , _world(context->world) {
+	_paddle = (Paddle*)ds::game::get_game_object(SID("Paddle"));
+	_ball = (Ball*)ds::game::get_game_object(SID("Ball"));
+	_bricks = (Bricks*)ds::game::get_game_object(SID("Bricks"));
+	/*
 	_grid = new Grid(context);
 	_world->create(v2(512, 384), "background");
 	v2 swp = LEFT_WALL_POS;
@@ -47,25 +50,24 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_scalePath.add(0.4f, v2(0.4f, 0.4f));
 	_scalePath.add(0.8f, v2(1.8f, 1.8f));
 	_scalePath.add(1.0f, v2(1, 1));
-	
-	//_effect = new ds::GrayScaleEffect();
-	_effect = new ds::BloomRenderEffect();
-	//_effect = new ds::GrayFadeEffect();
-	ds::editor::addSettingsEditor("Bloom", _effect->getSettings());
+	*/
 }
 
 // -------------------------------------------------------
 // destructor
 // -------------------------------------------------------
 MainGameState::~MainGameState(void) {
-	delete _effect;
-	delete _grid;
+	//delete _grid;
 }
 
 // -------------------------------------------------------
 // activate
 // -------------------------------------------------------
 void MainGameState::activate() {
+	_paddle->activate();
+	_ball->activate();
+	_bricks->activate();
+	setSticky();
 	restart();
 
 	_showPanel = false;
@@ -79,20 +81,22 @@ void MainGameState::activate() {
 // -------------------------------------------------------
 void MainGameState::restart() {
 	setSticky();
-	_grid->clear();
-	_grid->buildLevel(0);
+	//_grid->clear();
+	//_grid->buildLevel(0);
 }
 
 // -------------------------------------------------------
 // on button up
 // -------------------------------------------------------
 int MainGameState::onButtonUp(int button, int x, int y) {
+	/*
 	if (_sticky) {
 		v2 vel = ds::vector::getRadialVelocity(DEGTORAD(45.0f), 500.0f);
 		_world->moveBy(_ball_id, vel, true);
 		_sticky = false;
 		_context->trails->add(_ball_id, 5.0f, PST_BALL_TRAIL);
 	}
+	*/
 	return 0;
 }
 
@@ -100,6 +104,7 @@ int MainGameState::onButtonUp(int button, int x, int y) {
 // move player
 // -------------------------------------------------------
 void MainGameState::movePlayer() {
+	/*
 	// move player
 	_cursor_pos = ds::renderer::getMousePosition();
 	float angle = 0.0f;
@@ -117,11 +122,28 @@ void MainGameState::movePlayer() {
 		playerPosition.y += 30.0f;
 		_world->setPosition(_ball_id, playerPosition);
 	}
+	*/
 }
 // -------------------------------------------------------
 // update
 // -------------------------------------------------------
 int MainGameState::update(float dt) {
+
+	_context->world->tick(dt);
+
+	if (_sticky) {
+		v3 p = _context->world->getPosition(_paddle->getID());
+		p.y += 30;
+		_context->world->setPosition(_ball->getID(), p);
+	}
+	else {
+		v3 p = _context->world->getPosition(_ball->getID());
+		if (p.y < 60.0f) {
+			setSticky();
+		}
+		handleCollisions(dt);
+	}
+	/*
 	// move paddle
 	movePlayer();
 	// update grid
@@ -147,6 +169,7 @@ int MainGameState::update(float dt) {
 	}
 	// update the render effect
 	_effect->tick(dt);
+	*/
 	return 0;
 }
 
@@ -154,6 +177,56 @@ int MainGameState::update(float dt) {
 // handle collisions
 // -------------------------------------------------------
 void MainGameState::handleCollisions(float dt) {
+	int num = _context->world->numCollisions();
+	if (num > 0) {
+		LOG << "collisions: " << num;
+		for (int i = 0; i < num; ++i) {
+			ZoneTracker z1("MainGameState:collision");
+			const ds::Collision& c = _world->getCollision(i);
+			if (c.isBetween(OT_PLAYER, OT_BALL)) {
+				_ball->bounceY();
+			}
+			else if (c.isBetween(OT_BRICK, OT_BALL)) {
+				
+				v3 bp = _context->world->getPosition(c.getIDByType(OT_BRICK));
+				v3 pp = _context->world->getPosition(c.getIDByType(OT_BALL));
+
+				// http://gamedev.stackexchange.com/questions/29786/a-simple-2d-rectangle-collision-algorithm-that-also-determines-which-sides-that
+				float w = 0.5 * (100.0f + 18.0f);
+				float h = 0.5 * (30.0f + 18.0f);
+				float dx = bp.x - pp.x;
+				float dy = bp.y - pp.y;
+
+				if (abs(dx) <= w && abs(dy) <= h) {
+					float wy = w * dy;
+					float hx = h * dx;
+					LOG << "dx: " << dx << " dy: " << dy << " wy: " << wy << " hx: " << hx;
+					if (wy > hx) {
+						if (wy > -hx) {
+							LOG << "BOTTOM";
+							_ball->bounceY();
+						}
+						else {
+							LOG << "LEFT";
+							_ball->bounceX();
+						}
+					}
+					else {
+						if (wy > -hx) {
+							LOG << "RIGHT";
+							_ball->bounceX();
+						}
+						else {
+							LOG << "TOP";
+							_ball->bounceY();
+						}
+					}
+				}
+				_context->world->remove(c.getIDByType(OT_BRICK));
+			}
+		}
+	}
+	/*
 	// collisions
 	int numCollisions = _world->getNumCollisions();
 	if (numCollisions > 0) {
@@ -225,7 +298,8 @@ void MainGameState::handleCollisions(float dt) {
 						}
 					}
 				}
-				*/
+				
+				
 				LOG << "RET: " << ret;// << " brick: " << DBG_V2(bp) << " ball: " << DBG_V2(pp);
 				if (ds::bit::is_set(ret, 0) || ds::bit::is_set(ret, 2)) {
 					_world->bounce(_ball_id, ds::BD_Y, dt);
@@ -244,12 +318,14 @@ void MainGameState::handleCollisions(float dt) {
 			}
 		}
 	}
+	*/
 }
 
 // -------------------------------------------------------
 // ball player collision
 // -------------------------------------------------------
 void MainGameState::handleBallPlayerCollision() {
+	/*
 	v2 pp = _world->getPosition(_player_id);
 	v2 bp = _world->getPosition(_ball_id);
 	v2 diff = bp - pp;
@@ -261,12 +337,14 @@ void MainGameState::handleBallPlayerCollision() {
 	_world->setPosition(_ball_id, bp);
 	_world->startBehavior(_ball_id, "wiggle_scale");
 	_world->startBehavior(_player_id, "wiggle_player");
+	*/
 }
 
 // -------------------------------------------------------
 // render
 // -------------------------------------------------------
 void MainGameState::render() {
+	/*
 	_effect->start();
 	_world->renderSingleLayer(LT_BACKGROUND);
 	//_world->renderSingleLayer(LT_BORDER);
@@ -290,6 +368,7 @@ void MainGameState::render() {
 	}
 
 	//tweening::draw(tweening::get_by_index(_type), ds::math::buildTexture(0, 0, 4, 4), 0.02f, _delta);
+	*/
 }
 
 // -------------------------------------------------------
@@ -297,17 +376,22 @@ void MainGameState::render() {
 // -------------------------------------------------------
 void MainGameState::setSticky() {
 	_sticky = true;
-	_world->stopAction(_ball_id, ds::AT_MOVE_BY);
-	_context->trails->remove(_ball_id);
+	//_world->stopAction(_ball_id, ds::AT_MOVE_BY);
+	//_context->trails->remove(_ball_id);
 }
 
 // -------------------------------------------------------
 // on char
 // -------------------------------------------------------
-int MainGameState::onChar(int ascii) {
+int MainGameState::onChar(int ascii) {	
 	if (ascii == 's') {
 		setSticky();
 	}
+	if (ascii == 't') {
+		_ball->start();
+		_sticky = false;
+	}
+	/*
 	if (ascii == 'd') {
 		_showPanel = !_showPanel;
 	}
@@ -329,6 +413,7 @@ int MainGameState::onChar(int ascii) {
 	if (ascii == 'w') {
 		_grid->createNewLine(3);
 	}
+	*/
 	return 0;
 }
 

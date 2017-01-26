@@ -5,6 +5,9 @@
     <ClCompile Include="src\states\MainGameState.cpp">
       <Filter>states</Filter>
     </ClCompile>
+    <ClCompile Include="src\Paddle.cpp" />
+    <ClCompile Include="src\Ball.cpp" />
+    <ClCompile Include="src\Bricks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -13,6 +16,10 @@
       <Filter>states</Filter>
     </ClInclude>
     <ClInclude Include="src\GameContext.h" />
+    <ClInclude Include="src\Constants.h" />
+    <ClInclude Include="src\Paddle.h" />
+    <ClInclude Include="src\Ball.h" />
+    <ClInclude Include="src\Bricks.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />
@@ -23,6 +30,33 @@
       <Filter>content\resources</Filter>
     </None>
     <None Include="content\resources\xscale.json">
+      <Filter>content\resources</Filter>
+    </None>
+    <None Include="content\particles\emitter_explosion.json">
+      <Filter>content\particles</Filter>
+    </None>
+    <None Include="content\particles\explosion.json">
+      <Filter>content\particles</Filter>
+    </None>
+    <None Include="content\particles\particlesystems.json">
+      <Filter>content\particles</Filter>
+    </None>
+    <None Include="content\particles\ball_trail.json">
+      <Filter>content\particles</Filter>
+    </None>
+    <None Include="content\resources\behaviors.json">
+      <Filter>content\resources</Filter>
+    </None>
+    <None Include="content\resources\brick_definitions.json">
+      <Filter>content\resources</Filter>
+    </None>
+    <None Include="content\bloom.json">
+      <Filter>content</Filter>
+    </None>
+    <None Include="content\grayfade.json">
+      <Filter>content</Filter>
+    </None>
+    <None Include="content\resources\levels.json">
       <Filter>content\resources</Filter>
     </None>
   </ItemGroup>
@@ -38,6 +72,9 @@
     </Filter>
     <Filter Include="content\resources">
       <UniqueIdentifier>{d8fb6b15-cb6d-4a59-bcf9-3a44abd65b8d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="content\particles">
+      <UniqueIdentifier>{951df23a-ff39-4a4b-aefe-02a8b1b62f49}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
