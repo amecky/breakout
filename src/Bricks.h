@@ -1,14 +1,11 @@
 #pragma once
 #include <core\base\GameObject.h>
 #include "GameContext.h"
+#include "LevelData.h"
 
 struct Brick {
 	int energy;
 };
-
-const int GRID_X = 10;
-const int GRID_Y = 8;
-const int LEVELS = 3;
 
 class Bricks : public ds::GameObject {
 
@@ -18,7 +15,12 @@ public:
 	void tick(float dt);
 	void onActivation();
 	void onDeactivation();
+	bool handleCollision(ID id);
+	int setLevel(int level);
 private:
 	GameContext* _context;
-	int _data[GRID_X * GRID_Y * LEVELS];
+	LevelData _data;
+	ds::Texture _textures[4];
+	ds::V3Path _path;
+	int _level;
 };

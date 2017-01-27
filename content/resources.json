@@ -26,6 +26,10 @@ square_buffer {
 	texture : "TextureArray"
 	size : 16384
 }
+particle_manager {
+	sprite_buffer : "xxxx"
+	name : "yyyy"
+}
 dialog {
     name : "MainMenu"
     file : "MainMenu"

@@ -8,7 +8,7 @@ WarpingGrid::WarpingGrid(GameSettings* settings) : _settings(settings) {
 	_dotTex = math::buildTexture(0, 0, 4, 4);
 	_lineTex = math::buildTexture(2, 2, 10, 2);
 	_squareBuffer = ds::res::find("Squares", ds::ResourceType::SQUAREBUFFER);
-	_useSquares = false;
+	_useSquares = true;
 }
 
 WarpingGrid::~WarpingGrid() {
@@ -30,7 +30,7 @@ void WarpingGrid::createGrid() {
 				gp.movable = false;
 			}
 			gp.velocity = v2(0.0f);
-			gp.pos = v2(2.0f + x * GRID_SIZE, 50.0f + y * GRID_SIZE);
+			gp.pos = v2(108.0f + x * GRID_SIZE, 36.0f + y * GRID_SIZE);
 			gp.old_pos = gp.pos;
 			gp.color = _settings->grid.regular;
 			gp.fading = false;

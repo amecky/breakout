@@ -2,8 +2,8 @@
 #include "GameSettings.h"
 #include "GameContext.h"
 
-const int GRID_DIM_X = 41;
-const int GRID_DIM_Y = 22;
+const int GRID_DIM_X = 28;
+const int GRID_DIM_Y = 24;
 const float GRID_SIZE = 30.0f;
 
 struct GridPoint {

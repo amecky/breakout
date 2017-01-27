@@ -14,10 +14,10 @@ Paddle::~Paddle() {
 // activate player - create new entity
 // ------------------------------------------------------
 void Paddle::onActivation() {
-	_id = _context->world->create(v2(100, 80), math::buildTexture(200, 80, 102, 30), OT_PLAYER);
+	_id = _context->world->create(v2(512, 80), math::buildTexture(200, 80, 102, 30), OT_PLAYER);
 	_context->world->attachName(_id, "Paddle");
 	_context->world->attachCollider(_id, ds::PST_QUAD, v2(100.f, 30.0));
-	_previous = v2(100, 384);
+	_previous = v2(512, 384);
 	_velocity = 250.0f;
 }
 
@@ -36,7 +36,7 @@ void Paddle::tick(float dt) {
 	v2 wp = _context->world->getPosition(_id).xy();
 	v2 pos = wp;
 	pos += vel * _velocity * dt;
-	if (ds::math::isInside(pos, ds::Rect(0, 0, 1024, 768))) {
+	if ( pos.x > 150 && pos.x < 880) {
 		_context->world->setPosition(_id, pos);		
 	}
 }

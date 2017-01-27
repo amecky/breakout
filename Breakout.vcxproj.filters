@@ -5,11 +5,23 @@
     <ClCompile Include="src\states\MainGameState.cpp">
       <Filter>states</Filter>
     </ClCompile>
-    <ClCompile Include="src\Paddle.cpp" />
-    <ClCompile Include="src\Ball.cpp" />
-    <ClCompile Include="src\Bricks.cpp" />
     <ClCompile Include="src\ElasticBorder.cpp" />
     <ClCompile Include="src\WarpingGrid.cpp" />
+    <ClCompile Include="src\Ball.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Paddle.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelData.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Bricks.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirectionIndicator.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -19,12 +31,24 @@
     </ClInclude>
     <ClInclude Include="src\GameContext.h" />
     <ClInclude Include="src\Constants.h" />
-    <ClInclude Include="src\Paddle.h" />
-    <ClInclude Include="src\Ball.h" />
-    <ClInclude Include="src\Bricks.h" />
     <ClInclude Include="src\WarpingGrid.h" />
     <ClInclude Include="src\ElasticBorder.h" />
     <ClInclude Include="src\GameSettings.h" />
+    <ClInclude Include="src\Ball.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Paddle.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelData.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Bricks.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DirectionIndicator.h">
+      <Filter>objects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />
@@ -36,12 +60,6 @@
     </None>
     <None Include="content\resources\xscale.json">
       <Filter>content\resources</Filter>
-    </None>
-    <None Include="content\particles\emitter_explosion.json">
-      <Filter>content\particles</Filter>
-    </None>
-    <None Include="content\particles\explosion.json">
-      <Filter>content\particles</Filter>
     </None>
     <None Include="content\particles\particlesystems.json">
       <Filter>content\particles</Filter>
@@ -57,6 +75,9 @@
     </None>
     <None Include="content\resources\levels.json">
       <Filter>content\resources</Filter>
+    </None>
+    <None Include="content\particles\brick_explosion.json">
+      <Filter>content\particles</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -74,6 +95,9 @@
     </Filter>
     <Filter Include="content\particles">
       <UniqueIdentifier>{951df23a-ff39-4a4b-aefe-02a8b1b62f49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="objects">
+      <UniqueIdentifier>{d9685536-7695-413a-8508-1579846e7733}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

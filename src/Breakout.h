@@ -29,9 +29,5 @@ public:
 protected:
 	void prepare(ds::Settings* settings);
 private:
-	void reset();
-	virtual void OnChar( char ascii,unsigned int keyState );
-	void makeBallSticky();
-	void releaseBall();
 	GameContext* _context;
 };

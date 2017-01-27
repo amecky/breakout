@@ -19,13 +19,13 @@ public:
 	void setMoving(bool mv) {
 		_moving = mv;
 	}
-	void start();
+	void start(float angle);
 	void bounceY();
 	void bounceX();
 private:
 	GameContext* _context;
 	ID _id;
-	v2 _previous;
+	v3 _previous;
 	v2 _velocity;
 	bool _moving;
 };

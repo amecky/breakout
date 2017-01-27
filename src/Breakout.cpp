@@ -7,6 +7,7 @@
 #include "Bricks.h"
 #include "WarpingGrid.h"
 #include "ElasticBorder.h"
+#include "DirectionIndicator.h"
 
 ds::BaseApp *app = new Breakout(); 
 
@@ -46,45 +47,36 @@ bool Breakout::loadContent() {
 	_context->world = new ds::World;
 	_context->grid = new WarpingGrid(_context->settings);
 	_context->grid->createGrid();
+	_context->elasticBorder = new ElasticBorder();
+	_context->particles = ds::res::getParticleManager();
 
 	ds::game::add_game_object(new Paddle(_context));
 	ds::game::add_game_object(new Ball(_context));
 	ds::game::add_game_object(new Bricks(_context));
-	//_context->particles = particles;
-	//_context->trails = new ds::Trails(world,particles);
+	ds::game::add_game_object(new DirectionIndicator(_context));
 	//world->setBoundingRect(ds::Rect(40, 40, 940, 700));
 	//world->loadBehaviors();
 	addGameState(new MainGameState(_context));
 	return true;
 }
 
+// -------------------------------------------------------
+// init
+// -------------------------------------------------------
 void Breakout::init() {
 	pushState("MainGameState");
 }
 
-void Breakout::reset() {
-}
-
-// -------------------------------------------------------
-// make ball sticky
-// -------------------------------------------------------
-void Breakout::makeBallSticky() {
-}
-
-// -------------------------------------------------------
-// release sticky ball 
-// -------------------------------------------------------
-void Breakout::releaseBall() {
-}
 // -------------------------------------------------------
 // Update
 // -------------------------------------------------------
 void Breakout::update(float dt) {
 	_context->grid->tick(dt);
+	_context->elasticBorder->tick(dt);
 }
 
 // -------------------------------------------------------
-// Draw
+// render
 // -------------------------------------------------------
 void Breakout::render() {
 	_context->grid->render();
@@ -100,12 +92,8 @@ void Breakout::render() {
 		float r = rotations[i].x;
 		ds::Texture t = textures[i];
 		sprites->draw(positions[i].xy(), textures[i], rotations[i].x, scales[i].xy(), colors[i]);
-	}
+	}	
 	sprites->end();
-}
-
-void Breakout::OnChar( char ascii,unsigned int keyState ) {
-	if ( ascii == 'y' ) {
-		makeBallSticky();
-	}
+	_context->elasticBorder->render();
+	_context->particles->render();
 }

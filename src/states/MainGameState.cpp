@@ -5,53 +5,15 @@
 #include <core\io\FileRepository.h>
 #include "..\WarpingGrid.h"
 
-MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameState") , _context(context) , _world(context->world) {
+MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameState") , _context(context) {
 	_paddle = (Paddle*)ds::game::get_game_object(SID("Paddle"));
 	_ball = (Ball*)ds::game::get_game_object(SID("Ball"));
 	_bricks = (Bricks*)ds::game::get_game_object(SID("Bricks"));
-	/*
-	_grid = new Grid(context);
-	_world->create(v2(512, 384), "background");
-	v2 swp = LEFT_WALL_POS;
-	for (int i = 0; i < 15; ++i) {
-		ds::SID wall_id = _world->create(swp, "left_side_wall", LT_BACKGROUND);
-		_world->attachBoxCollider(wall_id, OT_LEFT_WALL, LT_OBJECTS);
-		swp.y += 40;
-	}
-	swp = RIGHT_WALL_POS;
-	for (int i = 0; i < 15; ++i) {
-		ds::SID wall_id = _world->create(swp, "right_side_wall", LT_BACKGROUND);
-		_world->attachBoxCollider(wall_id, OT_RIGHT_WALL, LT_OBJECTS);
-		swp.y += 40;
-	}
-	swp = TOP_WALL_POS;
-	for (int i = 0; i < 10; ++i) {
-		ds::SID wall_id = _world->create(swp, "top_wall", LT_BACKGROUND);
-		_world->attachBoxCollider(wall_id, OT_TOP_WALL, LT_OBJECTS);
-		swp.x += 70;
-	}
-	_ball_id = _world->create(v2(512, 384), "ball", LT_OBJECTS);
-	_player_id = _world->create(v2(512, 70), "player", LT_OBJECTS);
-	_world->attachBoxCollider(_ball_id, OT_BALL, LT_OBJECTS);
-	_world->attachBoxCollider(_player_id, OT_PLAYER, LT_OBJECTS);
-
-	_world->ignoreCollisions(OT_BRICK, OT_TOP_WALL);
-	_world->ignoreCollisions(OT_BRICK, OT_BRICK);
-	_world->ignoreCollisions(OT_PLAYER, OT_RIGHT_WALL);
-	_world->ignoreCollisions(OT_PLAYER, OT_LEFT_WALL);
-
-	//_world->attach_descriptor(LT_BORDER, "background_gradient");
-	//_world->create(v2(512, 700), ds::math::buildTexture(0, 0, 900, 10), 0.0f, 1.0f, 1.0f, ds::Color::WHITE, 666, LT_BORDER);
-	//_world->create(v2(960, 400), ds::math::buildTexture(0, 0, 600, 10), HALF_PI, 1.0f, 1.0f, ds::Color::WHITE, 666, LT_BORDER);
-	//_world->create(v2(512, 100), ds::math::buildTexture(0, 0, 900, 10), 0.0f, 1.0f, 1.0f, ds::Color::WHITE, 666, LT_BORDER);
-
-	_sticky = true;
-	
-	_scalePath.add(0.0f, v2(1, 1));
-	_scalePath.add(0.4f, v2(0.4f, 0.4f));
-	_scalePath.add(0.8f, v2(1.8f, 1.8f));
-	_scalePath.add(1.0f, v2(1, 1));
-	*/
+	_indicator = (DirectionIndicator*)ds::game::get_game_object(SID("DirectionIndicator"));
+	_sticky = false;
+	_numBricks = 0;
+	_killedBricks = 0;
+	_level = 0;
 }
 
 // -------------------------------------------------------
@@ -65,16 +27,14 @@ MainGameState::~MainGameState(void) {
 // activate
 // -------------------------------------------------------
 void MainGameState::activate() {
+	_sticky = false;
 	_paddle->activate();
 	_ball->activate();
-	_bricks->activate();
+	_bricks->activate();	
 	setSticky();
 	restart();
-
-	_showPanel = false;
-	_panelPosition = v2(10, 760);
-	_delta = 0.0f;
-	_type = 0;
+	_numBricks = _bricks->setLevel(_level);
+	_killedBricks = 0;
 }
 
 // -------------------------------------------------------
@@ -90,41 +50,14 @@ void MainGameState::restart() {
 // on button up
 // -------------------------------------------------------
 int MainGameState::onButtonUp(int button, int x, int y) {
-	/*
 	if (_sticky) {
-		v2 vel = ds::vector::getRadialVelocity(DEGTORAD(45.0f), 500.0f);
-		_world->moveBy(_ball_id, vel, true);
+		_ball->start(_indicator->getAngle());
+		_indicator->deactivate();
 		_sticky = false;
-		_context->trails->add(_ball_id, 5.0f, PST_BALL_TRAIL);
 	}
-	*/
 	return 0;
 }
 
-// -------------------------------------------------------
-// move player
-// -------------------------------------------------------
-void MainGameState::movePlayer() {
-	/*
-	// move player
-	_cursor_pos = ds::renderer::getMousePosition();
-	float angle = 0.0f;
-	v2 playerPosition = _world->getPosition(_player_id);
-	playerPosition.y = 65.0f;
-	playerPosition.x = _cursor_pos.x;
-	if (playerPosition.x < (LEFT_WALL_POS.x + 60.0f)) {
-		playerPosition.x = LEFT_WALL_POS.x + 60.0f;
-	}
-	if (playerPosition.x > (RIGHT_WALL_POS.x - 60.0f)) {
-		playerPosition.x = RIGHT_WALL_POS.x - 60.0f;
-	}
-	_world->setPosition(_player_id, playerPosition);
-	if (_sticky) {
-		playerPosition.y += 30.0f;
-		_world->setPosition(_ball_id, playerPosition);
-	}
-	*/
-}
 // -------------------------------------------------------
 // update
 // -------------------------------------------------------
@@ -144,33 +77,6 @@ int MainGameState::update(float dt) {
 		}
 		handleCollisions(dt);
 	}
-	/*
-	// move paddle
-	movePlayer();
-	// update grid
-	if (!_grid->tick(dt)) {
-		// GAME OVER!!!
-		LOG << "GAME OVER!!!!!";
-	}
-	// check collisions
-	handleCollisions(dt);
-	// check ball out of bounds
-	v2 ballPos = _world->getPosition(_ball_id);
-	if (ballPos.y < 65.0f) {
-		setSticky();
-	}
-	// update trails
-	_context->trails->tick(dt);
-	// update particles
-	_context->particles->update(dt);
-	// no clue what delta is supposed to be
-	_delta += dt / 2.0f;
-	if (_delta > 1.0f) {
-		_delta = 1.0f;
-	}
-	// update the render effect
-	_effect->tick(dt);
-	*/
 	return 0;
 }
 
@@ -183,8 +89,9 @@ void MainGameState::handleCollisions(float dt) {
 		LOG << "collisions: " << num;
 		for (int i = 0; i < num; ++i) {
 			ZoneTracker z1("MainGameState:collision");
-			const ds::Collision& c = _world->getCollision(i);
+			const ds::Collision& c = _context->world->getCollision(i);
 			if (c.isBetween(OT_PLAYER, OT_BALL)) {
+				//FIXME: push ball away
 				_ball->bounceY();
 			}
 			else if (c.isBetween(OT_BRICK, OT_BALL)) {
@@ -224,10 +131,13 @@ void MainGameState::handleCollisions(float dt) {
 					}
 				}
 				_context->grid->applyForce(pp.xy(), 0.3f, 5.0f, 40.0f);
-				Brick* data = (Brick*)_context->world->get_data(c.getIDByType(OT_BRICK));
-				--data->energy;
-				if (data->energy <= 0) {
+				if (_bricks->handleCollision(c.getIDByType(OT_BRICK))) {
 					_context->world->remove(c.getIDByType(OT_BRICK));
+					_context->particles->start(2, bp.xy());
+					++_killedBricks;
+					if (_killedBricks == _numBricks) {
+						LOG << "we are done - NEXT LEVEL!";
+					}
 				}
 			}
 		}
@@ -350,40 +260,17 @@ void MainGameState::handleBallPlayerCollision() {
 // render
 // -------------------------------------------------------
 void MainGameState::render() {
-	/*
-	_effect->start();
-	_world->renderSingleLayer(LT_BACKGROUND);
-	//_world->renderSingleLayer(LT_BORDER);
-	_world->renderSingleLayer(LT_OBJECTS);
-	//_effect->render();
-	//_effect->start();
-	_context->particles->render();
-	_effect->render();
-	int state = 1;
-	if (_showPanel) {
-		gui::start(100, &_panelPosition);
-		gui::begin("Debug", &state);
-		if (gui::Button("Restart")) {
-			restart();
-		}
-		gui::InputInt("Type", &_type);
-		if (gui::Button("Restart Tweening")) {
-			_delta = 0.0f;
-		}
-		gui::end();
-	}
-
-	//tweening::draw(tweening::get_by_index(_type), ds::math::buildTexture(0, 0, 4, 4), 0.02f, _delta);
-	*/
 }
 
 // -------------------------------------------------------
 // set sticky
 // -------------------------------------------------------
 void MainGameState::setSticky() {
-	_sticky = true;
-	//_world->stopAction(_ball_id, ds::AT_MOVE_BY);
-	//_context->trails->remove(_ball_id);
+	if (!_sticky) {
+		_sticky = true;
+		_indicator->activate();
+		_ball->setMoving(false);
+	}
 }
 
 // -------------------------------------------------------
@@ -394,8 +281,12 @@ int MainGameState::onChar(int ascii) {
 		setSticky();
 	}
 	if (ascii == 't') {
-		_ball->start();
+		_ball->start(_indicator->getAngle());
+		_indicator->deactivate();
 		_sticky = false;
+	}
+	if (ascii == 'r') {
+		_context->particles->start(1, v2(512, 384));
 	}
 	/*
 	if (ascii == 'd') {

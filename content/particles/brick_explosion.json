@@ -1,13 +1,13 @@
 spawn { 
 	texture : 80,160,20,20
     duration : 0
-    rate : 8
+    rate : 64
     loop : 0
     loop_delay : 0.0
 }
 ring_location {
-    radius : 6
-    variance : 4
+    radius : 40
+    variance : 10
     angle_variance : 30
     step : 0
 }

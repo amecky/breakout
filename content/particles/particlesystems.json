@@ -1,12 +1,8 @@
-explosion {
-	file : "explosion" 
-	id : 0
+ball_trail { 
+    id : 1
+    file : "ball_trail"
 }
-ball_trail {
-	file : "ball_trail"
-	id : 1
-}
-emitter_explosion {
-	file : "emitter_explosion" 
-	id : 2
+brick_explosion { 
+    id : 2
+    file : "brick_explosion"
 }
