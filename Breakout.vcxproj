@@ -229,6 +229,7 @@
     <ClCompile Include="src\DirectionIndicator.cpp" />
     <ClCompile Include="src\ElasticBorder.cpp" />
     <ClCompile Include="src\LevelData.cpp" />
+    <ClCompile Include="src\Messages.cpp" />
     <ClCompile Include="src\Paddle.cpp" />
     <ClCompile Include="src\states\MainGameState.cpp" />
     <ClCompile Include="src\WarpingGrid.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="src\GameContext.h" />
     <ClInclude Include="src\GameSettings.h" />
     <ClInclude Include="src\LevelData.h" />
+    <ClInclude Include="src\Messages.h" />
     <ClInclude Include="src\Paddle.h" />
     <ClInclude Include="src\states\MainGameState.h" />
     <ClInclude Include="src\WarpingGrid.h" />

@@ -10,6 +10,7 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_ball = (Ball*)ds::game::get_game_object(SID("Ball"));
 	_bricks = (Bricks*)ds::game::get_game_object(SID("Bricks"));
 	_indicator = (DirectionIndicator*)ds::game::get_game_object(SID("DirectionIndicator"));
+	_messages = (Messages*)ds::game::get_game_object(SID("Messages"));
 	_sticky = false;
 	_numBricks = 0;
 	_killedBricks = 0;
@@ -35,6 +36,8 @@ void MainGameState::activate() {
 	restart();
 	_numBricks = _bricks->setLevel(_level);
 	_killedBricks = 0;
+	_messages->add(v2(512, 384), math::buildTexture(0, 480, 115, 50));
+	_messages->activate();
 }
 
 // -------------------------------------------------------

@@ -8,6 +8,7 @@
 #include "WarpingGrid.h"
 #include "ElasticBorder.h"
 #include "DirectionIndicator.h"
+#include "Messages.h"
 
 ds::BaseApp *app = new Breakout(); 
 
@@ -54,6 +55,7 @@ bool Breakout::loadContent() {
 	ds::game::add_game_object(new Ball(_context));
 	ds::game::add_game_object(new Bricks(_context));
 	ds::game::add_game_object(new DirectionIndicator(_context));
+	ds::game::add_game_object(new Messages(_context));
 	//world->setBoundingRect(ds::Rect(40, 40, 940, 700));
 	//world->loadBehaviors();
 	addGameState(new MainGameState(_context));

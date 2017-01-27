@@ -7,6 +7,7 @@
 #include "..\Ball.h"
 #include "..\Bricks.h"
 #include "..\DirectionIndicator.h"
+#include "..\Messages.h"
 
 class MainGameState : public ds::GameState {
 
@@ -29,6 +30,7 @@ private:
 	Ball* _ball;
 	Bricks* _bricks;
 	DirectionIndicator* _indicator;
+	Messages* _messages;
 	int _level;
 	int _numBricks;
 	int _killedBricks;
