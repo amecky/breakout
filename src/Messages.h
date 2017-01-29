@@ -21,9 +21,12 @@ public:
 	void onDeactivation();
 	void add(const v2& pos, const ds::Texture& t);
 	void reset();
+	void showLevel(int lvl);
 private:
 	GameContext* _context;
 	ds::Array<Message> _messages;
+	ds::Texture _numbers[10];
+	ds::Texture _level;
 	
 };
 

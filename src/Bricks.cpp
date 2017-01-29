@@ -28,14 +28,18 @@ void Bricks::onActivation() {
 // set level and returns number of bricks
 // ------------------------------------------------------
 int Bricks::setLevel(int level) {
+	_context->world->removeByType(OT_BRICK);
 	int* data = _data.getDataPtr(level);
 	int cnt = 0;
 	for (int y = 0; y < 8; ++y) {
 		for (int x = 0; x < 10; ++x) {
 			int current = data[x + y * GRID_X];
 			if (current > 0) {
-				ID id = _context->world->create(v2(200 + x * 70, 400 + y * 40), _textures[current - 1], OT_BRICK);
+				v2 p = v2(200 + x * 70, 400 + y * 40);
+				ID id = _context->world->create(p, _textures[current - 1], OT_BRICK);
 				_context->world->attachCollider(id, ds::PST_QUAD, v2(60.f, 30.0));
+				float dy = math::random(0.0f, 80.0f) + 500.0f;
+				_context->world->moveTo(id, v3(p.x, p.y + dy, 0.0f), v3(p), 1.0f, tweening::easeInCubic);
 				Brick* data = (Brick*)_context->world->attach_data(id, sizeof(Brick), 100);
 				data->energy = current;
 				++cnt;
@@ -49,6 +53,7 @@ int Bricks::setLevel(int level) {
 // move ball
 // -------------------------------------------------------
 void Bricks::tick(float dt) {	
+
 }
 
 // ------------------------------------------------------

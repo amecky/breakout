@@ -36,7 +36,8 @@ void MainGameState::activate() {
 	restart();
 	_numBricks = _bricks->setLevel(_level);
 	_killedBricks = 0;
-	_messages->add(v2(512, 384), math::buildTexture(0, 480, 115, 50));
+	//_messages->add(v2(512, 384), math::buildTexture(515, 25, 220, 50));
+	_messages->showLevel(48);
 	_messages->activate();
 }
 
@@ -290,6 +291,9 @@ int MainGameState::onChar(int ascii) {
 	}
 	if (ascii == 'r') {
 		_context->particles->start(1, v2(512, 384));
+	}
+	if (ascii == 'n') {
+		_bricks->setLevel(0);
 	}
 	/*
 	if (ascii == 'd') {
