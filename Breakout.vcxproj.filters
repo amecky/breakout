@@ -25,6 +25,10 @@
     <ClCompile Include="src\Messages.cpp">
       <Filter>objects</Filter>
     </ClCompile>
+    <ClCompile Include="src\HUD.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -55,6 +59,10 @@
     <ClInclude Include="src\Messages.h">
       <Filter>objects</Filter>
     </ClInclude>
+    <ClInclude Include="src\HUD.h">
+      <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />
@@ -85,6 +93,12 @@
     <None Include="content\particles\brick_explosion.json">
       <Filter>content\particles</Filter>
     </None>
+    <None Include="content\resources.json">
+      <Filter>content</Filter>
+    </None>
+    <None Include="content\dialogs\HUD.json">
+      <Filter>content\dialogs</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Breakout.rc" />
@@ -104,6 +118,9 @@
     </Filter>
     <Filter Include="objects">
       <UniqueIdentifier>{d9685536-7695-413a-8508-1579846e7733}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="content\dialogs">
+      <UniqueIdentifier>{6551969d-81b8-4785-ba6a-cc9343afbbe0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

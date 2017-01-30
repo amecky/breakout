@@ -2,6 +2,7 @@
 #include <core\math\GameMath.h>
 #include <base\InputSystem.h>
 #include "Constants.h"
+#include <core\base\EventStream.h>
 
 Bricks::Bricks(GameContext* ctx) : ds::GameObject("Bricks") , _context(ctx) {
 	_data.load();
@@ -30,30 +31,41 @@ void Bricks::onActivation() {
 int Bricks::setLevel(int level) {
 	_context->world->removeByType(OT_BRICK);
 	int* data = _data.getDataPtr(level);
-	int cnt = 0;
+	_numBricks = 0;
 	for (int y = 0; y < 8; ++y) {
 		for (int x = 0; x < 10; ++x) {
 			int current = data[x + y * GRID_X];
 			if (current > 0) {
 				v2 p = v2(200 + x * 70, 400 + y * 40);
-				ID id = _context->world->create(p, _textures[current - 1], OT_BRICK);
-				_context->world->attachCollider(id, ds::PST_QUAD, v2(60.f, 30.0));
 				float dy = math::random(0.0f, 80.0f) + 500.0f;
+				ID id = _context->world->create(v2(p.x, p.y + dy), _textures[current - 1], OT_BRICK);
+				_context->world->attachCollider(id, ds::PST_QUAD, v2(60.f, 30.0));				
 				_context->world->moveTo(id, v3(p.x, p.y + dy, 0.0f), v3(p), 1.0f, tweening::easeInCubic);
 				Brick* data = (Brick*)_context->world->attach_data(id, sizeof(Brick), 100);
 				data->energy = current;
-				++cnt;
+				++_numBricks;
 			}
 		}
 	}
-	return cnt;
+	_movedBricks = 0;
+	return _numBricks;
 }
 
 // -------------------------------------------------------
 // move ball
 // -------------------------------------------------------
 void Bricks::tick(float dt) {	
-
+	if (_context->world->numEvents() > 0) {
+		for (uint32_t i = 0; i < _context->world->numEvents(); ++i) {
+			const ds::ActionEvent& ev = _context->world->getEvent(i);
+			if (ev.action == ds::AT_MOVE_TO && ev.type == OT_BRICK) {
+				++_movedBricks;
+				if (_movedBricks == _numBricks) {
+					ds::events::send(BRICKS_MOVED);
+				}
+			}
+		}
+	}
 }
 
 // ------------------------------------------------------

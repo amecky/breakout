@@ -11,6 +11,7 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 	_bricks = (Bricks*)ds::game::get_game_object(SID("Bricks"));
 	_indicator = (DirectionIndicator*)ds::game::get_game_object(SID("DirectionIndicator"));
 	_messages = (Messages*)ds::game::get_game_object(SID("Messages"));
+	_hud = (HUD*)ds::game::get_game_object(SID("HUD"));
 	_sticky = false;
 	_numBricks = 0;
 	_killedBricks = 0;
@@ -21,7 +22,6 @@ MainGameState::MainGameState(GameContext* context) : ds::GameState("MainGameStat
 // destructor
 // -------------------------------------------------------
 MainGameState::~MainGameState(void) {
-	//delete _grid;
 }
 
 // -------------------------------------------------------
@@ -30,15 +30,13 @@ MainGameState::~MainGameState(void) {
 void MainGameState::activate() {
 	_sticky = false;
 	_paddle->activate();
-	_ball->activate();
 	_bricks->activate();	
-	setSticky();
-	restart();
-	_numBricks = _bricks->setLevel(_level);
 	_killedBricks = 0;
-	//_messages->add(v2(512, 384), math::buildTexture(515, 25, 220, 50));
-	_messages->showLevel(48);
+	_messages->showLevel(1);
 	_messages->activate();
+	_hud->activate();
+	_hud->setLevel(1);
+	_running = false;
 }
 
 // -------------------------------------------------------
@@ -69,17 +67,30 @@ int MainGameState::update(float dt) {
 
 	_context->world->tick(dt);
 
-	if (_sticky) {
-		v3 p = _context->world->getPosition(_paddle->getID());
-		p.y += 30;
-		_context->world->setPosition(_ball->getID(), p);
-	}
-	else {
-		v3 p = _context->world->getPosition(_ball->getID());
-		if (p.y < 60.0f) {
-			setSticky();
+	_hud->tick(dt);
+
+	if (_running) {
+		if (_sticky) {
+			v3 p = _context->world->getPosition(_paddle->getID());
+			p.y += 30;
+			_context->world->setPosition(_ball->getID(), p);
 		}
-		handleCollisions(dt);
+		else {
+			v3 p = _context->world->getPosition(_ball->getID());
+			if (p.y < 60.0f) {
+				setSticky();
+			}
+			handleCollisions(dt);
+		}
+	}
+	if (ds::events::containsType(MESSAGE_DISPLAYED)) {
+		_numBricks = _bricks->setLevel(_level);
+	}
+	if (ds::events::containsType(BRICKS_MOVED)) {
+		_messages->deactivate();
+		_running = true;
+		_ball->activate();
+		setSticky();	
 	}
 	return 0;
 }

@@ -31,29 +31,9 @@ particle_manager {
 	name : "yyyy"
 }
 dialog {
-    name : "MainMenu"
-    file : "MainMenu"
+    name : "HUD"
+    file : "HUD"
     font : "nullshock"
-}
-dialog {
-    name : "GameOver"
-    file : "GameOver"
-    font : "nullshock"
-}
-dialog {
-    name : "Credits"
-    file : "Credits"
-    font : "nullshock"
-}
-script {
-	name : "MoveSomething"
-	file : "test"
-	variables : "DT,MV,AMP"
-}
-script {
-	name : "Wiggle"
-	file : "wiggle"
-	variables : "TIMER,TWO_PI"
 }
 render_target {
 	name : "RT1"

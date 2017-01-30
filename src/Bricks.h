@@ -23,4 +23,6 @@ private:
 	ds::Texture _textures[4];
 	ds::V3Path _path;
 	int _level;
+	int _numBricks;
+	int _movedBricks;
 };

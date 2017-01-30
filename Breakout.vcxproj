@@ -228,10 +228,12 @@
     <ClCompile Include="src\Bricks.cpp" />
     <ClCompile Include="src\DirectionIndicator.cpp" />
     <ClCompile Include="src\ElasticBorder.cpp" />
+    <ClCompile Include="src\HUD.cpp" />
     <ClCompile Include="src\LevelData.cpp" />
     <ClCompile Include="src\Messages.cpp" />
     <ClCompile Include="src\Paddle.cpp" />
     <ClCompile Include="src\states\MainGameState.cpp" />
+    <ClCompile Include="src\utils.cpp" />
     <ClCompile Include="src\WarpingGrid.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -244,18 +246,22 @@
     <ClInclude Include="src\ElasticBorder.h" />
     <ClInclude Include="src\GameContext.h" />
     <ClInclude Include="src\GameSettings.h" />
+    <ClInclude Include="src\HUD.h" />
     <ClInclude Include="src\LevelData.h" />
     <ClInclude Include="src\Messages.h" />
     <ClInclude Include="src\Paddle.h" />
     <ClInclude Include="src\states\MainGameState.h" />
+    <ClInclude Include="src\utils.h" />
     <ClInclude Include="src\WarpingGrid.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />
+    <None Include="content\dialogs\HUD.json" />
     <None Include="content\engine_settings.json" />
     <None Include="content\particles\ball_trail.json" />
     <None Include="content\particles\brick_explosion.json" />
     <None Include="content\particles\particlesystems.json" />
+    <None Include="content\resources.json" />
     <None Include="content\resources\behaviors.json" />
     <None Include="content\resources\brick_definitions.json" />
     <None Include="content\resources\levels.json" />
