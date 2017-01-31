@@ -36,6 +36,7 @@ void MainGameState::activate() {
 	_messages->activate();
 	_hud->activate();
 	_hud->setLevel(1);
+	//_hud->addScore(1234);
 	_running = false;
 }
 
@@ -305,6 +306,15 @@ int MainGameState::onChar(int ascii) {
 	}
 	if (ascii == 'n') {
 		_bricks->setLevel(0);
+	}
+	if (ascii == '1') {
+		_hud->addScore(20);
+	}
+	if (ascii == '2') {
+		_hud->addScore(50);
+	}
+	if (ascii == '3') {
+		_hud->addScore(100);
 	}
 	/*
 	if (ascii == 'd') {
