@@ -2,67 +2,83 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\Breakout.cpp" />
-    <ClCompile Include="src\states\MainGameState.cpp">
-      <Filter>states</Filter>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\scenes\MainScene.cpp">
+      <Filter>scenes</Filter>
     </ClCompile>
-    <ClCompile Include="src\ElasticBorder.cpp" />
-    <ClCompile Include="src\WarpingGrid.cpp" />
-    <ClCompile Include="src\Ball.cpp">
+    <ClCompile Include="src\objects\Ball.cpp">
       <Filter>objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\Paddle.cpp">
+    <ClCompile Include="src\objects\DirectionIndicator.cpp">
       <Filter>objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\LevelData.cpp">
+    <ClCompile Include="src\objects\Bricks.cpp">
       <Filter>objects</Filter>
     </ClCompile>
-    <ClCompile Include="src\Bricks.cpp">
-      <Filter>objects</Filter>
+    <ClCompile Include="src\lib\math.cpp">
+      <Filter>lib</Filter>
     </ClCompile>
-    <ClCompile Include="src\DirectionIndicator.cpp">
-      <Filter>objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Messages.cpp">
-      <Filter>objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\HUD.cpp">
-      <Filter>objects</Filter>
-    </ClCompile>
-    <ClCompile Include="src\utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\Breakout.h" />
-    <ClInclude Include="src\states\MainGameState.h">
-      <Filter>states</Filter>
+    <ClInclude Include="src\scenes\MainScene.h">
+      <Filter>scenes</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameContext.h" />
-    <ClInclude Include="src\Constants.h" />
-    <ClInclude Include="src\WarpingGrid.h" />
-    <ClInclude Include="src\ElasticBorder.h" />
-    <ClInclude Include="src\GameSettings.h" />
-    <ClInclude Include="src\Ball.h">
+    <ClInclude Include="ext\stb_image.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\diesel.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\ds_base_app.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\ds_imgui.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\ds_logpanel.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\ds_profiler.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\ds_string.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\ds_tweakable.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\ds_tweening.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\ds_vm.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\SpriteBatchBuffer.h">
+      <Filter>ext</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\Ball.h">
       <Filter>objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\Paddle.h">
+    <ClInclude Include="src\objects\DirectionIndicator.h">
       <Filter>objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelData.h">
+    <ClInclude Include="src\objects\Bricks.h">
       <Filter>objects</Filter>
     </ClInclude>
-    <ClInclude Include="src\Bricks.h">
-      <Filter>objects</Filter>
+    <ClInclude Include="src\lib\DataArray.h">
+      <Filter>lib</Filter>
     </ClInclude>
-    <ClInclude Include="src\DirectionIndicator.h">
-      <Filter>objects</Filter>
+    <ClInclude Include="src\lib\math.h">
+      <Filter>lib</Filter>
     </ClInclude>
-    <ClInclude Include="src\Messages.h">
-      <Filter>objects</Filter>
+    <ClInclude Include="src\lib\AABBox.h">
+      <Filter>lib</Filter>
     </ClInclude>
-    <ClInclude Include="src\HUD.h">
-      <Filter>objects</Filter>
+    <ClInclude Include="ext\ds_intersection.h">
+      <Filter>ext</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />
@@ -121,6 +137,15 @@
     </Filter>
     <Filter Include="content\dialogs">
       <UniqueIdentifier>{6551969d-81b8-4785-ba6a-cc9343afbbe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scenes">
+      <UniqueIdentifier>{43d6bbf5-296f-49b8-9d73-6ebfee4cd0af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ext">
+      <UniqueIdentifier>{b48c012d-51cd-4b0d-bac1-434c0cd4fd6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lib">
+      <UniqueIdentifier>{26c8947b-6109-494f-b9ee-fbfddd6c54a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

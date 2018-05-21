@@ -1,33 +1,41 @@
-#pragma comment(lib, "D11.lib")
-#pragma comment(lib, "DieselCore.lib")
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dsound.lib")
-#pragma comment(lib, "dxerr.lib")
-#pragma warning(disable : 4995)
-
 #pragma once
-#include "base\BaseApp.h"
-#include <renderer\render_types.h>
+#include <ds_base_app.h>
+#include <SpriteBatchBuffer.h>
+#include "objects\Ball.h"
+#include "objects\DirectionIndicator.h"
+#include "objects\Bricks.h"
 
 struct GameContext;
+
+struct Paddle {
+	ds::vec2 position;
+	ds::vec4 texture;
+	// FIXME: flag for squeezing
+	bool wiggling;
+	float timer;
+};
 
 class Breakout : public ds::BaseApp {
 
 public:	
 	Breakout();
 	virtual ~Breakout();
-	bool loadContent();
-	bool initialize() {
-		return true;
-	}
-	const char* getTitle() {
-		return "Breakout";
-	}
+	void initialize();
 	void update(float dt);
 	void render();
-	void init();
-protected:
-	void prepare(ds::Settings* settings);
+	void drawLeftPanel();
 private:
+	void handleButtons();
+	bool _buttonPressed[2];
+	bool _buttonClicked[2];
 	GameContext* _context;
+	bool _mousePressed;
+	bool _rightButtonPressed;
+	SpriteBatchBuffer* _sprites;
+	Paddle _paddle;
+	Ball _ball;
+	Bricks _bricks;
+	DirectionIndicator _indicator;
+
+	bool _dbgFollow;
 };

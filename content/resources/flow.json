@@ -1,0 +1,12 @@
+"flow" : {	
+	"channel" : {
+		"type" : "Vector2f" ,
+		"name" : "pos_channel"
+	} ,
+	"connections" : {
+		"connection" : {
+			"channel" : "pos_channel" ,
+			"system" : "sprite_renderer"
+		}
+	}
+}

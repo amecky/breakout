@@ -1,0 +1,10 @@
+"texture_atlas" {
+	"name" : "MyAtlas"
+	"grid_size" : "30"
+	"texture_size" : "1024"
+	"item" { "name" : "Button" , "rect" : "900,0,390,80" }	
+	"item" { "name" : "Logo" , "rect" : "500,0,780,125" }
+	"item" { "name" : "Honeycomb" , "rect" : "300,420,378,124" }
+	"item" { "name" : "Honeycomb_Bottom" , "rect" : "0,420,378,98" }
+	"item" { "name" : "Grid" , "rect" : "0,40,80,80" }
+}
