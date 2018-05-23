@@ -4,6 +4,7 @@
 #include "objects\Ball.h"
 #include "objects\DirectionIndicator.h"
 #include "objects\Bricks.h"
+#include "objects\Worm.h"
 
 struct GameContext;
 
@@ -14,6 +15,8 @@ struct Paddle {
 	bool wiggling;
 	float timer;
 };
+
+
 
 class Breakout : public ds::BaseApp {
 
@@ -36,6 +39,9 @@ private:
 	Ball _ball;
 	Bricks _bricks;
 	DirectionIndicator _indicator;
-
+	Worm _worm;
 	bool _dbgFollow;
+	float _dbgRelaxation;
+	float _dbgMinDist;
+
 };

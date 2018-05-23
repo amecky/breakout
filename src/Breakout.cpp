@@ -41,9 +41,19 @@ Breakout::~Breakout() {
 
 void Breakout::initialize() {
 	RID textureID = loadImageFromFile("content\\textures\\TextureArray.png");
+
+	RID blendState = ds::createBlendState(ds::BlendStateDesc()
+		.SrcBlend(ds::BlendStates::SRC_ALPHA)
+		.SrcAlphaBlend(ds::BlendStates::ZERO)
+		.DestBlend(ds::BlendStates::ONE)
+		.DestAlphaBlend(ds::BlendStates::ZERO)
+		.AlphaEnabled(true)
+	);
+
 	_sprites = new SpriteBatchBuffer(SpriteBatchDesc()
 		.MaxSprites(2048)
 		.Texture(textureID)
+		.BlendState(blendState)
 	);
 	_paddle.position = ds::vec2(512, 80);
 	_paddle.texture = ds::vec4(80, 200, 102, 30);
@@ -93,6 +103,10 @@ void Breakout::initialize() {
 		DBG_LOG("diff x %3.0f y %3.0f", diff.x, diff.y);
 	}
 	*/
+
+	
+	_dbgRelaxation = 0.2f;
+	_dbgMinDist = 12.0f;
 }
 
 // -------------------------------------------------------
@@ -198,16 +212,23 @@ void Breakout::update(float dt) {
 	if (p.y < 40.0f) {
 		_ball.reset();
 	}
+
+	_worm.move(dt, _dbgMinDist, _dbgRelaxation);
+	
 }
 
 void Breakout::render() {
 	_sprites->begin();
+	/*
 	_sprites->add(_paddle.position, _paddle.texture);
 	_bricks.render(_sprites);
 	_sprites->add(_ball.getPosition(), ds::vec4(160, 60, 18, 18));
 	if (_ball.isSticky()) {
 		_sprites->add(_indicator.getPosition(), ds::vec4(280, 300, 120, 120), ds::vec2(1.0f), _indicator.getRotation());
-	}	
+	}
+	*/
+	_worm.render(_sprites);
+
 	_sprites->flush();
 }
 
@@ -217,6 +238,8 @@ void Breakout::drawLeftPanel() {
 	if (gui::Button("Reset ball")) {
 		_ball.reset();
 	}
+	gui::Input("Min dist", &_dbgMinDist);
+	gui::Input("Relaxation", &_dbgRelaxation);
 }
 
 void Breakout::handleButtons() {
