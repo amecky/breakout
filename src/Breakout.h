@@ -5,8 +5,14 @@
 #include "objects\DirectionIndicator.h"
 #include "objects\Bricks.h"
 #include "objects\Worm.h"
+#include "utils\ExpressionManager.h"
 
 struct GameContext;
+
+struct MoveDesc {
+	float data[16];
+	ds::vec2 center;
+};
 
 struct Paddle {
 	ds::vec2 position;
@@ -39,9 +45,12 @@ private:
 	Ball _ball;
 	Bricks _bricks;
 	DirectionIndicator _indicator;
+	Transformation _movement;
+	MoveDesc _desc;
 	Worm _worm;
 	bool _dbgFollow;
 	float _dbgRelaxation;
 	float _dbgMinDist;
-
+	ExpressionManager _expressionManager;
+	int _moveXId;
 };

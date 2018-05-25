@@ -1,696 +1,619 @@
-#pragma once
-#include <stdint.h>
+/*
+	ds_vm v1.0 https://github.com/amecky/ds_vm MIT license
 
-namespace vm {
+	This is a single header C implementation of a simple math expression parser.
+	In order to use you need to do this in *one* C or C++ to create the implementation:
+	#include ...
+	#include ...
+	#define DS_VM_IMPLEMENTATION
+	#include "ds_vm.h"
 
-	struct CharBuffer {
+	You can also define VM_MALLOC and VM_FREE to avoid using malloc,free
 
-		char* data;
-		uint16_t size;
-		uint16_t capacity;
-		uint16_t num;
+	Here is a short example demonstrating the usage:
 
-		CharBuffer();
-		~CharBuffer();
+	vm_context* ctx = vm_create_context();
+	vm_token tokens[64];
+	int ret = vm_parse(ctx, "10 + ( 4 * 3 + 8 / 2)", tokens, 64);
+	float r = 0.0f;
+	int code = vm_run(ctx, tokens, num, &r);
+	if (code == 0) {
+		printf("Result: %g\n", r);
+	}
+	else {
+		printf("Error: %s\n", vm_get_error(code));
+	}
+	vm_free(ctx);
 
-		void* alloc(uint16_t sz);
-		void resize(uint16_t newCap);
-		uint16_t append(const char* s, int len);
-		uint16_t append(const char* s);
-		uint16_t append(char s);
-		const char* get(uint16_t index) const;
+	Release notes:
 
+	v1.0 - initial release
+
+	============================    Contributors    =========================
+
+	Andreas Mecky (amecky@gmail.com)
+
+
+
+*/
+
+#ifndef DS_VM_INCLUDE_H
+#define DS_VM_INCLUDE_H
+#include <stdlib.h>
+
+#ifndef VM_MALLOC
+#define VM_MALLOC(sz) malloc(sz)
+#define VM_FREE(p) free(p)
+#endif
+
+#ifdef DS_VM_STATIC
+#define DSDEF static
+#else
+#define DSDEF extern
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+	struct vm_stack_t {
+		float* data;
+		int size;
+		int capacity;
 	};
 
-	struct Token {
+	typedef struct vm_stack_t vm_stack;
 
-		enum TokenType { EMPTY, NUMBER, FUNCTION, VARIABLE, LEFT_PARENTHESIS, RIGHT_PARENTHESIS };
+	typedef void(*vmFunction)(vm_stack*);
 
-		Token() : type(EMPTY), value(0.0f) {}
-		Token(TokenType t) : type(t), value(0.0f) {}
-		Token(TokenType type, uint16_t id) : type(type), id(id) {}
-		Token(TokenType type, float value) : type(type), value(value) {}
+	typedef enum { TOK_EMPTY, TOK_NUMBER, TOK_FUNCTION, TOK_VARIABLE, TOK_LEFT_PARENTHESIS, TOK_RIGHT_PARENTHESIS } vm_token_type;
 
-		TokenType type;
+	struct vm_token_t {
+		vm_token_type type;
 		union {
-			uint16_t id;
+			int id;
 			float value;
 		};
 	};
 
-	enum ValueType {
-		VT_VARIABLE, VT_CONSTANT
-	};
+	typedef struct vm_token_t vm_token;
 
-	struct Variable {
-		ValueType type;
-		uint16_t nameIndex;
+	struct vm_variable_t {
+		int hash;
 		float value;
 	};
 
-	struct Context {
+	typedef struct vm_variable_t vm_variable;
 
-		uint16_t num_variables;
-		Variable variables[32];
-		CharBuffer names;
+	struct vm_function_t {
+		int hash;
+		vmFunction function;
+		int precedence;
+		int num_parameters;
+	};
 
-		Context() : num_variables(0) {}
+	typedef struct vm_function_t vm_function;
 
-		uint16_t add_variable(const char* name, float value = 0.0f) {
-			Variable& v = variables[num_variables++];
-			v.nameIndex = names.append(name);
-			v.type = VT_VARIABLE;
-			v.value = value;
-			return num_variables - 1;
-		}
+	struct vm_context_t {
 
-		uint16_t add_variable(const char* name, int length, float value = 0.0f) {
-			Variable& v = variables[num_variables++];
-			v.nameIndex = names.append(name, length);
-			v.type = VT_VARIABLE;
-			v.value = value;
-			return num_variables - 1;
-		}
-
-		uint16_t add_constant(const char* name, float value) {
-			Variable& v = variables[num_variables++];
-			v.nameIndex = names.append(name);
-			v.type = VT_CONSTANT;
-			v.value = value;
-			return num_variables - 1;
-		}
+		int num_variables;
+		vm_variable variables[32];
+		vm_function functions[32];
+		int num_functions;
 
 	};
 
-	struct Expression {
-		vm::Token* tokens;
-		uint16_t num;
-		uint16_t id;
+	typedef struct vm_context_t vm_context;
 
-		Expression() : num(0), id(0), tokens(0) {}
-		~Expression() {
-			if (tokens != 0) {
-				delete[] tokens;
-			}
-		}
-	};
+	DSDEF vm_context* vm_create_context();
 
-	const char* get_token_name(Token::TokenType type);
+	DSDEF int vm_add_variable(vm_context* ctx, const char* name, float value);
 
-	uint16_t parse(const char* source, Context& ctx, Token* tokens, uint16_t capacity);
+	DSDEF void vm_set_variable(vm_context* ctx, const char* name, float value);
 
-	void parse(const char* source, Context& ctx, Expression& e);
+	DSDEF void vm_add_function(vm_context* ctx, const char* name, vmFunction func, int precedence, int num_params);
 
-	float run(Token* byteCode, uint16_t capacity, Context& ctx, const char* result_name = 0);
+	DSDEF int vm_parse(vm_context* ctx, const char* source, vm_token* tokens, int capacity);
 
-	void print_bytecode(const Context& ctx, Token* byteCode, uint16_t num);
+	DSDEF int vm_run(vm_context* ctx, vm_token* byteCode, int capacity, float* ret);
 
-	void print_bytecode(const Context& ctx, const Expression& exp);
+	DSDEF void vm_debug(vm_token* tokens, int num);
 
+	DSDEF void vm_destroy_context(vm_context* ctx);
+
+	DSDEF const char* vm_get_error(int code);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif
 
 #ifdef DS_VM_IMPLEMENTATION
-#include <string.h>
-#include <stdio.h>
-#include <math.h>
-#include <random>
 
-namespace vm {
+struct vm_error_code_t {
+	int code;
+	const char* message;
+};
 
-	// ------------------------------------------------------------------
-	// token names
-	// ------------------------------------------------------------------
-	const char* TOKEN_NAMES[] = { "EMPTY", "NUMBER", "FUNCTION", "VARIABLE", "LEFT_PARENTHESIS", "RIGHT_PARENTHESIS" };
+typedef struct vm_error_code_t vm_error_code;
 
-	// ------------------------------------------------------------------
-	// get token name
-	// ------------------------------------------------------------------
-	const char* get_token_name(Token::TokenType type) {
-		return TOKEN_NAMES[type % 6];
+const static vm_error_code ERRORS[] = {
+	{0,"Success"},
+	{1,"No return value on stack"},
+	{2,"Requested number of parameters not found on stack"}
+};
+
+const char* TOKEN_NAMES[] = { "TOK_EMPTY", "TOK_NUMBER", "TOK_FUNCTION", "TOK_VARIABLE", "TOK_LEFT_PARENTHESIS", "TOK_RIGHT_PARENTHESIS" };
+
+const int FNV_Prime = 0x01000193; //   16777619
+const int FNV_Seed = 0x811C9DC5; // 2166136261
+
+// ------------------------------------------------------------------
+// internal method to generate hash
+// ------------------------------------------------------------------
+static inline int vm__fnv1a(const char* text) {
+	const unsigned char* ptr = (const unsigned char*)text;
+	int hash = FNV_Seed;
+	while (*ptr) {
+		hash = (*ptr++ ^ hash) * FNV_Prime;
 	}
+	return hash;
+}
 
-	// ------------------------------------------------------------------
-	// op codes
-	// ------------------------------------------------------------------
-	enum OpCode { OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_UNARY_MINUS, OP_NOP, OP_SIN, OP_COS, OP_ABS, OP_RAMP, OP_LERP, OP_RANGE, OP_SATURATE, OP_RANDOM, OP_CHANNEL };
+// ------------------------------------------------------------------
+// get error message by code
+// ------------------------------------------------------------------
+DSDEF const char* vm_get_error(int code) {
+	return ERRORS[code].message;
+}
 
-	const char* FUNCTION_NAMES[] = { ",","+","-","*","/","u-","u+","sin","cos","abs","ramp","lerp","range","saturate","random", "channel" };
-	// ------------------------------------------------------------------
-	// Function definition
-	// ------------------------------------------------------------------
-	struct Function {
-		const char* name;
-		OpCode code;
-		uint8_t precedence;
-		uint8_t num_parameters;
-	};
+#ifndef VM_PUSH
+#define VM_PUSH(stack,value) vm__push(stack,value)
+#define VM_POP(stack)        vm__pop(stack)
+#endif
 
-	// ------------------------------------------------------------------
-	// Functions
-	// ------------------------------------------------------------------
-	const static Function FUNCTIONS[] = {
-		{ FUNCTION_NAMES[0], OP_NOP, 1, 0 },
-		{ FUNCTION_NAMES[1], OP_ADD, 12,2 },
-		{ FUNCTION_NAMES[2], OP_SUB, 12, 2 },
-		{ FUNCTION_NAMES[3], OP_MUL, 13,2 },
-		{ FUNCTION_NAMES[4], OP_DIV, 13,2 },
-		{ FUNCTION_NAMES[5], OP_UNARY_MINUS, 16, 1 },
-		{ FUNCTION_NAMES[6], OP_NOP, 1, 0 },
-		{ FUNCTION_NAMES[7], OP_SIN, 17, 1 },
-		{ FUNCTION_NAMES[8], OP_COS, 17, 1 },
-		{ FUNCTION_NAMES[9], OP_ABS, 17, 1 },
-		{ FUNCTION_NAMES[10], OP_RAMP, 17, 2 },
-		{ FUNCTION_NAMES[11], OP_LERP, 17, 3 },
-		{ FUNCTION_NAMES[12], OP_RANGE, 17, 3 },
-		{ FUNCTION_NAMES[13], OP_SATURATE, 17, 3 },
-		{ FUNCTION_NAMES[14], OP_RANDOM, 17, 2 },
-		{ FUNCTION_NAMES[15], OP_RANDOM, 17, 1 }
-	};
+static float vm__pop(vm_stack* stack) { return stack->data[--stack->size]; }
+static void vm__push(vm_stack* stack, float f) { stack->data[stack->size++] = f; }
 
-	const uint16_t NUM_FUNCTIONS = 16;
-
-	const char* get_function_name(uint16_t id) {
-		return FUNCTIONS[id].name;
+// ------------------------------------------------------------------
+// internal method to build hash from string
+// ------------------------------------------------------------------
+static int vm__build_hash(const char* v, int len) {
+	int l = 0;
+	char tmp[256];
+	for (int i = 0; i < len; ++i) {
+		tmp[l++] = v[i];
 	}
+	tmp[l] = '\0';
+	int r = vm__fnv1a(tmp);
+	return r;
+}
 
-	// ------------------------------------------------------------------
-	// find variable
-	// ------------------------------------------------------------------
-	static uint16_t find_variable(const char *s, uint16_t len, const Context& ctx) {
-		for (uint16_t i = 0; i < ctx.num_variables; ++i) {
-			const char* varName = ctx.names.get(ctx.variables[i].nameIndex);
-			if (strncmp(s, varName, len) == 0 && strlen(varName) == len) {
-				return i;
-			}
+// ------------------------------------------------------------------
+// add new variable to vm_context
+// ------------------------------------------------------------------
+DSDEF int vm_add_variable(vm_context* ctx, const char* name, float value) {
+	vm_variable* v = &ctx->variables[ctx->num_variables++];
+	v->hash = vm__fnv1a(name);
+	v->value = value;
+	return  ctx->num_variables - 1;
+}
+
+// ------------------------------------------------------------------
+// set value of variable
+// ------------------------------------------------------------------
+DSDEF void vm_set_variable(vm_context* ctx, const char* name, float value) {
+	int h = vm__fnv1a(name);
+	for (int i = 0; i < ctx->num_variables; ++i) {
+		if (ctx->variables[i].hash == h) {
+			ctx->variables[i].value = value;
 		}
-		return UINT16_MAX;
 	}
+}
 
-	// ------------------------------------------------------------------
-	// find function
-	// ------------------------------------------------------------------
-	static uint16_t find_function(const char *s, uint16_t len) {
-		for (uint16_t i = 0; i < NUM_FUNCTIONS; ++i) {
-			if (strncmp(s, FUNCTIONS[i].name, len) == 0 && strlen(FUNCTIONS[i].name) == len) {
-				return i;
-			}
+// ------------------------------------------------------------------
+// internal method to add a new variable
+// ------------------------------------------------------------------
+static int vm__add_variable(vm_context* ctx, const char* name, int length, float value) {
+	vm_variable* v = &ctx->variables[ctx->num_variables++];
+	v->hash = vm__build_hash(name, length);
+	v->value = value;
+	return  ctx->num_variables - 1;
+}
+
+// ------------------------------------------------------------------
+// add function to vm_context
+// ------------------------------------------------------------------
+DSDEF void vm_add_function(vm_context* ctx, const char* name, vmFunction func, int precedence, int num_params) {
+	vm_function* f = &ctx->functions[ctx->num_functions++];
+	f->hash = vm__fnv1a(name);
+	f->function = func;
+	f->precedence = precedence;
+	f->num_parameters = num_params;
+}
+
+// ------------------------------------------------------------------
+// all supported functions
+// ------------------------------------------------------------------
+static void vm_no_op(vm_stack* stack) {}
+
+static void vm_add(vm_stack* stack) {
+	VM_PUSH(stack, VM_POP(stack) + VM_POP(stack));
+}
+
+static void vm_sub(vm_stack* stack) {
+	float a = VM_POP(stack);
+	float b = VM_POP(stack);
+	VM_PUSH(stack,b - a);
+}
+
+static void vm_mul(vm_stack* stack) {
+	VM_PUSH(stack, VM_POP(stack) * VM_POP(stack));
+}
+
+static void vm_div(vm_stack* stack) {
+	float a = VM_POP(stack);
+	float b = VM_POP(stack);
+	VM_PUSH(stack, b / a);
+}
+
+static void vm_pow(vm_stack* stack) {
+	float a = VM_POP(stack);
+	float b = VM_POP(stack);
+	VM_PUSH(stack, pow(b,a));
+}
+
+static void vm_sin(vm_stack* stack) {
+	VM_PUSH(stack, sin(VM_POP(stack)));
+}
+
+static void vm_cos(vm_stack* stack) {
+	VM_PUSH(stack, cos(VM_POP(stack)));
+}
+
+static void vm_tan(vm_stack* stack) {
+	VM_PUSH(stack, tan(VM_POP(stack)));
+}
+
+static void vm_abs(vm_stack* stack) {
+	VM_PUSH(stack, abs(VM_POP(stack)));
+}
+
+static void vm_lerp(vm_stack* stack) {
+	float t = VM_POP(stack); 
+	float a = VM_POP(stack); 
+	float b = VM_POP(stack); 
+	VM_PUSH(stack,(1.0f - t) * b + t * a);
+}
+
+// ------------------------------------------------------------------
+// create new vm_context
+// ------------------------------------------------------------------
+DSDEF vm_context* vm_create_context() {
+	vm_context* ctx = (vm_context*)VM_MALLOC(sizeof(vm_context));
+	ctx->num_variables = 0;
+	ctx->num_functions = 0;
+	vm_add_function(ctx, ",", vm_no_op, 1, 0);
+	vm_add_function(ctx, "+", vm_add, 12, 2);
+	vm_add_function(ctx, "-", vm_sub, 12, 2);
+	vm_add_function(ctx, "*", vm_mul, 13, 2);
+	vm_add_function(ctx, "/", vm_div, 13, 2);
+	vm_add_function(ctx, "u-", vm_abs, 16, 1);
+	vm_add_function(ctx, "u+", vm_no_op, 1, 0);
+	vm_add_function(ctx, "sin", vm_sin, 17, 1);
+	vm_add_function(ctx, "cos", vm_cos, 17, 1);
+	vm_add_function(ctx, "abs", vm_abs, 17, 1);
+	vm_add_function(ctx, "lerp", vm_lerp, 17, 1);
+	vm_add_function(ctx, "pow", vm_pow, 17, 2);
+	vm_add_function(ctx, "exp", vm_lerp, 17, 1);
+	vm_add_function(ctx, "tan", vm_tan, 17, 1);
+	return ctx;
+}
+
+// ------------------------------------------------------------------
+// destroy vm_context
+// ------------------------------------------------------------------
+DSDEF void vm_destroy_context(vm_context* ctx) {
+	VM_FREE(ctx);
+}
+
+// ------------------------------------------------------------------
+// internal method to find a variable
+// ------------------------------------------------------------------
+static int vm__find_variable(const char *s, int len, vm_context* ctx) {
+	int h = vm__build_hash(s, len);
+	for (int i = 0; i < ctx->num_variables; ++i) {
+		if ( ctx->variables[i].hash == h) {
+			return i;
 		}
-		return UINT16_MAX;
 	}
+	return -1;
+}
 
-	// ------------------------------------------------------------------
-	// is numeric
-	// ------------------------------------------------------------------
-	static bool isNumeric(const char c) {
-		return ((c >= '0' && c <= '9'));
-	}
-
-	// ------------------------------------------------------------------
-	// is whitespace
-	// ------------------------------------------------------------------
-	static bool isWhitespace(const char c) {
-		if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
-			return true;
+// ------------------------------------------------------------------
+// internal method to find a function
+// ------------------------------------------------------------------
+static int vm__find_function(vm_context* ctx, const char *s, int len) {
+	int h = vm__build_hash(s, len);
+	for (int i = 0; i < ctx->num_functions; ++i) {
+		if ( h == ctx->functions[i].hash) {
+			return i;
 		}
-		return false;
 	}
+	return -1;
+}
 
-	// ------------------------------------------------------------------
-	// get token for identifier
-	// ------------------------------------------------------------------
-	static Token token_for_identifier(const char *identifier, unsigned len, Context& ctx) {
-		uint16_t i;
-		char tmp[256];
-		const char* p = identifier;
+// ------------------------------------------------------------------
+// is numeric
+// ------------------------------------------------------------------
+static int vm__is_numeric(const char c) {
+	if ((c >= '0' && c <= '9')) {
+		return 1;
+	}
+	return 0;
+}
+
+// ------------------------------------------------------------------
+// is whitespace
+// ------------------------------------------------------------------
+static int vm__is_whitespace(const char c) {
+	if (c == ' ' || c == '\t' || c == '\r' || c == '\n') {
+		return 1;
+	}
+	return 0;
+}
+
+// ------------------------------------------------------------------
+// get token for identifier
+// ------------------------------------------------------------------
+static vm_token vm__token_for_identifier(vm_context* ctx, const char *identifier, unsigned len) {
+	int i;
+	if ((i = vm__find_variable(identifier, len, ctx)) != -1) {
+		vm_token t;
+		t.type = TOK_VARIABLE;
+		t.id = i;
+		return t;
+	}
+	else if ((i = vm__find_function(ctx, identifier, len)) != -1) {
+		vm_token t;
+		t.type = TOK_FUNCTION;
+		t.id = i;
+		return t;
+	}
+	else {
 		int l = 0;
-		while (l < len) {
-			tmp[l++] = *p;
+		const char* p = identifier;
+		while (!vm__is_whitespace(*p)) {
+			++l;
 			++p;
 		}
-		tmp[l] = '\0';
-		if ((i = find_variable(identifier, len, ctx)) != UINT16_MAX) {
-			return Token(Token::VARIABLE, i);
+		i = vm__add_variable(ctx, identifier, l, 0.0f);
+		vm_token t;
+		t.type = TOK_VARIABLE;
+		t.id = i;
+		return t;
+	}
+}
+
+// ------------------------------------------------------------------
+// internal method to check wether there is a known function
+// ------------------------------------------------------------------
+static int vm__has_function(vm_context* ctx, char * identifier) {
+	if (vm__find_function(ctx, identifier, strlen(identifier)) != -1) {
+		return 1;
+	}
+	return 0;
+}
+
+
+
+// ------------------------------------------------------------------
+// strtof
+// ------------------------------------------------------------------
+static float vm__strtof(const char* p, char** endPtr) {
+	while (vm__is_whitespace(*p)) {
+		++p;
+	}
+	float sign = 1.0f;
+	if (*p == '-') {
+		sign = -1.0f;
+		++p;
+	}
+	else if (*p == '+') {
+		++p;
+	}
+	float value = 0.0f;
+	while (vm__is_numeric(*p)) {
+		value *= 10.0f;
+		value = value + (*p - '0');
+		++p;
+	}
+	if (*p == '.') {
+		++p;
+		float dec = 1.0f;
+		float frac = 0.0f;
+		while (vm__is_numeric(*p)) {
+			frac *= 10.0f;
+			frac = frac + (*p - '0');
+			dec *= 10.0f;
+			++p;
 		}
-		else if ((i = find_function(identifier, len)) != UINT16_MAX) {
-			return Token(Token::FUNCTION, i);
+		value = value + (frac / dec);
+	}
+	if (endPtr) {
+		*endPtr = (char *)(p);
+	}
+	return value * sign;
+}
+
+// ------------------------------------------------------------------
+// Function stack item
+// ------------------------------------------------------------------
+struct FunctionVMStackItem_t {
+	vm_token token;
+	int precedence;
+	int par_level;
+};
+
+typedef struct FunctionVMStackItem_t FunctionVMStackItem;
+
+static int cmp(FunctionVMStackItem t,FunctionVMStackItem f) {
+	if (t.par_level != f.par_level) return t.par_level - f.par_level;
+	return t.precedence - f.precedence;
+}
+
+// ------------------------------------------------------------------
+// internal method to create a token
+// ------------------------------------------------------------------
+vm_token vm__create_token(vm_token_type type) {
+	vm_token t;
+	t.type = type;
+	t.value = 0.0f;
+	return t;
+}
+
+// ------------------------------------------------------------------
+// internal method to create a token
+// ------------------------------------------------------------------
+vm_token vm__create_token_with_value(vm_token_type type, float value) {
+	vm_token t;
+	t.type = type;
+	t.value = value;
+	return t;
+}
+// ------------------------------------------------------------------
+// parse
+// ------------------------------------------------------------------
+DSDEF int vm_parse(vm_context* ctx, const char * source, vm_token * byteCode, int capacity) {
+	int binary = 1;
+	const char* p = source;
+	unsigned num_tokens = 0;
+	unsigned overflow_tokens = 0;
+	vm_token* tokens = (vm_token*)VM_MALLOC(capacity * sizeof(vm_token));
+	while (*p != 0) {
+		vm_token token;
+		token.type = TOK_EMPTY;
+		if (*p >= '0' && *p <= '9') {
+			char *out;
+			token = vm__create_token_with_value(TOK_NUMBER, vm__strtof(p, &out));
+			p = out;
+			binary = 0;
+		}
+		else if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_')) {
+			const char *identifier = p;
+			while ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p >= '0' && *p <= '9'))
+				p++;
+			token = vm__token_for_identifier(ctx, identifier, p - identifier);
+			binary = 0;
 		}
 		else {
-			int l = 0;
-			const char* p = identifier;
-			while (!isWhitespace(*p)) {
-				++l;
-				++p;
-			}
-			i = ctx.add_variable(identifier, l);
-			return Token(Token::VARIABLE, i);
-		}
-	}
-
-	// ------------------------------------------------------------------
-	// get token for identifier
-	// ------------------------------------------------------------------
-	static Token token_for_identifier(const char *identifier, Context& ctx) {
-		return token_for_identifier(identifier, strlen(identifier), ctx);
-	}
-
-	// ------------------------------------------------------------------
-	// has function
-	// ------------------------------------------------------------------
-	static bool has_function(char * identifier) {
-		return find_function(identifier, strlen(identifier)) != UINT16_MAX;
-	}
-
-
-
-	// ------------------------------------------------------------------
-	// strtof
-	// ------------------------------------------------------------------
-	static float strtof(const char* p, char** endPtr) {
-		while (isWhitespace(*p)) {
-			++p;
-		}
-		float sign = 1.0f;
-		if (*p == '-') {
-			sign = -1.0f;
-			++p;
-		}
-		else if (*p == '+') {
-			++p;
-		}
-		float value = 0.0f;
-		while (isNumeric(*p)) {
-			value *= 10.0f;
-			value = value + (*p - '0');
-			++p;
-		}
-		if (*p == '.') {
-			++p;
-			float dec = 1.0f;
-			float frac = 0.0f;
-			while (isNumeric(*p)) {
-				frac *= 10.0f;
-				frac = frac + (*p - '0');
-				dec *= 10.0f;
-				++p;
-			}
-			value = value + (frac / dec);
-		}
-		if (endPtr) {
-			*endPtr = (char *)(p);
-		}
-		return value * sign;
-	}
-
-
-
-
-
-	// ------------------------------------------------------------------
-	// Function stack item
-	// ------------------------------------------------------------------
-	struct FunctionStackItem {
-		FunctionStackItem() {}
-		FunctionStackItem(Token t, int p, int pl) : token(t), precedence(p), par_level(pl) {}
-		inline int cmp(const FunctionStackItem &f) const {
-			if (par_level != f.par_level) return par_level - f.par_level;
-			return precedence - f.precedence;
-		}
-		inline bool operator<(const FunctionStackItem &other) const { return cmp(other) < 0; }
-		inline bool operator<=(const FunctionStackItem &other) const { return cmp(other) <= 0; }
-		inline bool operator==(const FunctionStackItem &other) const { return cmp(other) == 0; }
-		inline bool operator>=(const FunctionStackItem &other) const { return cmp(other) >= 0; }
-		inline bool operator>(const FunctionStackItem &other) const { return cmp(other) > 0; }
-		Token token;
-		int precedence;
-		int par_level;
-	};
-
-	// -------------------------------------------------------
-	// random
-	// -------------------------------------------------------
-	static std::mt19937 mt;
-	static bool rnd_first = true;
-
-	static void init_random(unsigned long seed) {
-		std::random_device r;
-		std::seed_seq new_seed{ r(), r(), r(), r(), r(), r(), r(), r() };
-		mt.seed(new_seed);
-	}
-
-
-	float random(float min, float max) {
-		if (rnd_first) {
-			rnd_first = false;
-			init_random(0);
-		}
-		std::uniform_real_distribution<float> dist(min, max);
-		return dist(mt);
-	}
-	// ------------------------------------------------------------------
-	// Stack
-	// ------------------------------------------------------------------
-	struct Stack {
-
-		float* data;
-		uint16_t size;
-		uint16_t capacity;
-
-		inline float pop() { return data[--size]; }
-		inline void push(float f) { data[size++] = f; }
-	};
-
-	// ------------------------------------------------------------------
-	// parse
-	// ------------------------------------------------------------------
-	uint16_t parse(const char * source, Context& ctx, Token * byteCode, uint16_t capacity) {
-		printf("source: '%s'\n", source);
-		bool binary = false;
-		const char* p = source;
-		unsigned num_tokens = 0;
-		unsigned overflow_tokens = 0;
-		Token* tokens = new Token[capacity];
-		while (*p != 0) {
-			Token token(Token::EMPTY);
-			if (*p >= '0' && *p <= '9') {
-				char *out;
-				token = Token(Token::NUMBER, strtof(p, &out));
-				p = out;
-				binary = true;
-			}
-			else if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_')) {
-				const char *identifier = p;
-				while ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p >= '0' && *p <= '9'))
-					p++;
-				token = token_for_identifier(identifier, p - identifier, ctx);
-				binary = true;
-			}
-			else {
-				switch (*p) {
-				case '(': token = Token(Token::LEFT_PARENTHESIS); binary = false; break;
-				case ')': token = Token(Token::RIGHT_PARENTHESIS); binary = true; break;
+			switch (*p) {
+			case '(': token = vm__create_token(TOK_LEFT_PARENTHESIS); binary = 1; break;
+				case ')': token = vm__create_token(TOK_RIGHT_PARENTHESIS); binary = 0; break;
 				case ' ': case '\t': case '\n': case '\r': break;
-				case '-': token = token_for_identifier(binary ? "-" : "u-", ctx); binary = false; break;
-				case '+': token = token_for_identifier(binary ? "+" : "u+", ctx); binary = false; break;
+				case '-': token = vm__token_for_identifier(ctx, binary == 0 ? "-" : "u-", 1 + binary); binary = 1; break;
+				case '+': token = vm__token_for_identifier(ctx, binary == 0 ? "+" : "u+", 1 + binary); binary = 1; break;
 				default: {
 					char s1[2] = { *p,0 };
 					char s2[3] = { *p, *(p + 1), 0 };
-					if (s2[1] && has_function(s2)) {
-						token = token_for_identifier(s2, ctx);
+					if (s2[1] && vm__has_function(ctx, s2)) {
+						token = vm__token_for_identifier(ctx, s2,2);
 						++p;
 					}
 					else {
-						token = token_for_identifier(s1, ctx);
+						token = vm__token_for_identifier(ctx, s1, 1);
 					}
-					binary = false;
+					binary = 0;
 					break;
 				}
-				}
-				++p;
 			}
-
-			if (token.type != Token::EMPTY) {
-				if (num_tokens == capacity)
-					++overflow_tokens;
-				else
-					tokens[num_tokens++] = token;
-			}
+			++p;
 		}
 
-		uint16_t num_rpl = 0;
-		FunctionStackItem function_stack[256];
+		if (token.type != TOK_EMPTY) {
+			if (num_tokens == capacity)
+				++overflow_tokens;
+			else
+				tokens[num_tokens++] = token;
+		}
+	}
 
-		unsigned num_function_stack = 0;
+	int num_rpl = 0;
+	FunctionVMStackItem function_stack[256];
 
-		int par_level = 0;
-		for (unsigned i = 0; i<num_tokens; ++i) {
-			Token &token = tokens[i];
-			switch (token.type) {
-			case Token::NUMBER:
-			case Token::VARIABLE:
+	unsigned num_function_stack = 0;
+
+	int par_level = 0;
+	for (unsigned i = 0; i<num_tokens; ++i) {
+		vm_token token = tokens[i];
+		switch (token.type) {
+			case TOK_NUMBER:
+			case TOK_VARIABLE:
 				byteCode[num_rpl++] = token;
 				break;
-			case Token::LEFT_PARENTHESIS:
+			case TOK_LEFT_PARENTHESIS:
 				++par_level;
 				break;
-			case Token::RIGHT_PARENTHESIS:
+			case TOK_RIGHT_PARENTHESIS:
 				--par_level;
 				break;
-			case Token::FUNCTION: {
-				FunctionStackItem f(token, FUNCTIONS[token.id].precedence, par_level);
-				while (num_function_stack>0 && function_stack[num_function_stack - 1] >= f)
+			case TOK_FUNCTION: {
+				FunctionVMStackItem f;
+				f.token = token;
+				f.precedence = ctx->functions[token.id].precedence;
+				f.par_level = par_level;
+				while (num_function_stack>0 && cmp(function_stack[num_function_stack - 1],f) >= 0)
 					byteCode[num_rpl++] = function_stack[--num_function_stack].token;
 				function_stack[num_function_stack++] = f;
 				break;
 			}
-			}
 		}
-
-		while (num_function_stack > 0) {
-			byteCode[num_rpl++] = function_stack[--num_function_stack].token;
-		}
-		delete[] tokens;
-		return num_rpl;
-
 	}
 
-	// ------------------------------------------------------------------
-	// parse
-	// ------------------------------------------------------------------
-	void parse(const char * source, Context& ctx, Expression& exp) {
-		bool binary = false;
-		const char* p = source;
-		uint16_t num_tokens = 0;
-		uint16_t overflow_tokens = 0;
-		Token tokens[512];
-		while (*p != 0) {
-			Token token(Token::EMPTY);
-			if (*p >= '0' && *p <= '9') {
-				char *out;
-				token = Token(Token::NUMBER, strtof(p, &out));
-				p = out;
-				binary = true;
-			}
-			else if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_')) {
-				const char *identifier = p;
-				while ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p >= '0' && *p <= '9'))
-					p++;
-				token = token_for_identifier(identifier, p - identifier, ctx);
-				binary = true;
+	while (num_function_stack > 0) {
+		byteCode[num_rpl++] = function_stack[--num_function_stack].token;
+	}
+	VM_FREE(tokens);
+	return num_rpl;
+
+}
+
+// ------------------------------------------------------------------
+// run
+// ------------------------------------------------------------------
+DSDEF int vm_run(vm_context* ctx, vm_token* byteCode, int capacity, float* ret) {
+	float stack_data[32] = { 0.0f };
+	vm_stack stack = { stack_data, 0, 32 };
+	for (int i = 0; i < capacity; ++i) {
+		if (byteCode[i].type == TOK_NUMBER) {
+			VM_PUSH(&stack,byteCode[i].value);
+		}
+		else if (byteCode[i].type == TOK_VARIABLE) {
+			VM_PUSH(&stack,ctx->variables[byteCode[i].id].value);
+		}
+		else if (byteCode[i].type == TOK_FUNCTION) {
+			int id = byteCode[i].id;
+			vm_function f = ctx->functions[id];
+			if (stack.size >= f.num_parameters) {
+				(f.function)(&stack);
 			}
 			else {
-				switch (*p) {
-				case '(': token = Token(Token::LEFT_PARENTHESIS); binary = false; break;
-				case ')': token = Token(Token::RIGHT_PARENTHESIS); binary = true; break;
-				case ' ': case '\t': case '\n': case '\r': break;
-				case '-': token = token_for_identifier(binary ? "-" : "u-", ctx); binary = false; break;
-				case '+': token = token_for_identifier(binary ? "+" : "u+", ctx); binary = false; break;
-				default: {
-					char s1[2] = { *p,0 };
-					char s2[3] = { *p, *(p + 1), 0 };
-					if (s2[1] && has_function(s2)) {
-						token = token_for_identifier(s2, ctx);
-						++p;
-					}
-					else {
-						token = token_for_identifier(s1, ctx);
-					}
-					binary = false;
-					break;
-				}
-				}
-				++p;
+				return 2;
 			}
-
-			if (token.type != Token::EMPTY) {
-				if (num_tokens == 512)
-					++overflow_tokens;
-				else
-					tokens[num_tokens++] = token;
-			}
-		}
-
-		exp.tokens = new Token[num_tokens];
-
-		uint16_t num_rpl = 0;
-		FunctionStackItem function_stack[256];
-
-		unsigned num_function_stack = 0;
-
-		int par_level = 0;
-		for (unsigned i = 0; i<num_tokens; ++i) {
-			Token &token = tokens[i];
-			switch (token.type) {
-			case Token::NUMBER:
-			case Token::VARIABLE:
-				exp.tokens[num_rpl++] = token;
-				break;
-			case Token::LEFT_PARENTHESIS:
-				++par_level;
-				break;
-			case Token::RIGHT_PARENTHESIS:
-				--par_level;
-				break;
-			case Token::FUNCTION: {
-				FunctionStackItem f(token, FUNCTIONS[token.id].precedence, par_level);
-				while (num_function_stack>0 && function_stack[num_function_stack - 1] >= f)
-					exp.tokens[num_rpl++] = function_stack[--num_function_stack].token;
-				function_stack[num_function_stack++] = f;
-				break;
-			}
-			}
-		}
-
-		while (num_function_stack > 0) {
-			exp.tokens[num_rpl++] = function_stack[--num_function_stack].token;
-		}
-		exp.num = num_rpl;
-	}
-
-	// ------------------------------------------------------------------
-	// print byte code
-	// ------------------------------------------------------------------
-	void print_bytecode(const Context& ctx, Token* byteCode, uint16_t num) {
-		printf("--------------------------------------\n");
-		printf("num: %d\n", num);
-		printf("variables:\n");
-		for (uint16_t i = 0; i < ctx.num_variables; ++i) {
-			printf("%d = %s : %g\n", i, ctx.names.get(ctx.variables[i].nameIndex), ctx.variables[i].value);
-		}
-		for (uint16_t i = 0; i < num; ++i) {
-			byteCode[i] = byteCode[i];
-			if (byteCode[i].type == Token::NUMBER) {
-				printf("%d = %s (%g)\n", i, get_token_name(byteCode[i].type), byteCode[i].value);
-			}
-			else if (byteCode[i].type == Token::VARIABLE) {
-				printf("%d = %s (%d)\n", i, get_token_name(byteCode[i].type), byteCode[i].id);
-			}
-			else {
-				printf("%d = %s (%s)\n", i, get_token_name(byteCode[i].type), get_function_name(byteCode[i].id));
-			}
-		}
-		printf("--------------------------------------\n");
-	}
-
-	void print_bytecode(const Context& ctx, const Expression& exp) {
-		print_bytecode(ctx, exp.tokens, exp.num);
-	}
-
-	// ------------------------------------------------------------------
-	// run
-	// ------------------------------------------------------------------
-	float run(Token* byteCode, uint16_t capacity, Context& ctx, const char* result_name) {
-		float stack_data[32] = { 0.0f };
-		Stack stack = { stack_data, 0, 32 };
-		float a, b, t;
-		for (uint16_t i = 0; i < capacity; ++i) {
-			if (byteCode[i].type == vm::Token::NUMBER) {
-				stack.push(byteCode[i].value);
-			}
-			else if (byteCode[i].type == vm::Token::VARIABLE) {
-				stack.push(ctx.variables[byteCode[i].id].value);
-			}
-			else if (byteCode[i].type == vm::Token::FUNCTION) {
-				uint16_t id = byteCode[i].id;
-				const Function& f = FUNCTIONS[id];
-				switch (f.code) {
-				case OP_ADD: stack.push(stack.pop() + stack.pop()); break;
-				case OP_SUB: a = stack.pop(); b = stack.pop(); stack.push(b - a); break;
-				case OP_MUL: stack.push(stack.pop() * stack.pop()); break;
-				case OP_DIV: a = stack.pop(); b = stack.pop(); stack.push(b / a); break;
-				case OP_SIN: stack.push(sin(stack.pop())); break;
-				case OP_COS: stack.push(cos(stack.pop())); break;
-				case OP_ABS: stack.push(abs(stack.pop())); break;
-				case OP_RAMP: a = stack.pop(); t = stack.pop(); stack.push(a >= t ? 1.0f : 0.0f); break;
-				case OP_RANGE: t = stack.pop(); b = stack.pop(); a = stack.pop(); stack.push(t >= a && t <= b ? 1.0f : 0.0f); break;
-				case OP_LERP: t = stack.pop(); a = stack.pop(); b = stack.pop(); stack.push((1.0f - t) * b + t * a); break;
-				case OP_SATURATE: a = stack.pop(); if (a < 0.0f) stack.push(0.0f); else if (a > 1.0f) stack.push(1.0f); else stack.push(a); break;
-				case OP_RANDOM: a = stack.pop(); b = stack.pop(); stack.push(random(b, a)); break;
-				case OP_CHANNEL: a = stack.pop(); stack.push(a); break;
-				}
-			}
-		}
-		float r = 0.0f;
-		if (stack.size > 0) {
-			r = stack.pop();
-		}
-		if (result_name != 0) {
-			uint16_t id = find_variable(result_name, strlen(result_name), ctx);
-			if (id != UINT16_MAX) {
-				ctx.variables[id].value = r;
-			}
-		}
-		return r;
-	}
-
-	CharBuffer::CharBuffer() : data(nullptr), size(0), capacity(0), num(0) {}
-
-	CharBuffer::~CharBuffer() {
-		if (data != nullptr) {
-			delete[] data;
 		}
 	}
-
-	void* CharBuffer::alloc(uint16_t sz) {
-		if (size + sz > capacity) {
-			int d = capacity * 2 + 8;
-			if (d < sz) {
-				d = sz * 2 + 8;
-			}
-			resize(d);
-		}
-		auto res = data + size;
-		size += sz;
-		int d = sz / 4;
-		if (d == 0) {
-			d = 1;
-		}
-		num += d;
-		return res;
+	if (stack.size > 0) {
+		*ret = VM_POP(&stack);
+		return 0;
 	}
+	return 1;
+}
 
-	void CharBuffer::resize(uint16_t newCap) {
-		if (newCap > capacity) {
-			char* tmp = new char[newCap];
-			if (data != nullptr) {
-				memcpy(tmp, data, size);
-				delete[] data;
-			}
-			capacity = newCap;
-			data = tmp;
-		}
-	}
-
-	const char* CharBuffer::get(uint16_t index) const {
-		return data + index;
-	}
-
-	uint16_t CharBuffer::append(const char* s, int len) {
-		if (size + len + 1 > capacity) {
-			resize(capacity + len + 1 + 8);
-		}
-		const char* t = s;
-		uint16_t ret = size;
-		for (int i = 0; i < len; ++i) {
-			data[size++] = *t;
-			++t;
-		}
-		data[size++] = '\0';
-		return ret;
-	}
-
-	uint16_t CharBuffer::append(const char* s) {
-		int len = strlen(s);
-		return append(s, len);
-	}
-
-	uint16_t CharBuffer::append(char s) {
-		if (size + 1 > capacity) {
-			resize(capacity + 9);
-		}
-		uint16_t ret = size;
-		data[size++] = s;
-		data[size++] = '\0';
-		return ret;
+DSDEF void vm_debug(vm_token* tokens, int num) {
+	printf("bytecode: \n");
+	for (int i = 0; i < num; ++i) {
+		printf("%d : %s %d %g\n", i, TOKEN_NAMES[tokens[i].type], tokens[i].id, tokens[i].value);
 	}
 }
 

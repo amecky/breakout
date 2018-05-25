@@ -4,6 +4,24 @@
 #include "lib\AABBox.h"
 #include <ds_intersection.h>
 
+static void testMove(Transformation* transformation, float dt) {
+	transformation->timer += dt;
+	transformation->previous = transformation->pos;
+	transformation->pos.y = (15.0f * cos(transformation->timer * -6.0f)) + (240.0f + (180.0f * sin(transformation->timer * 1.3f)));
+	transformation->pos.x = (15.0f * sin(transformation->timer * -6.0f)) + (320.0f + (200.0f * cos(transformation->timer / 1.5f)));
+	transformation->rotation = math::get_rotation(transformation->pos - transformation->previous);
+}
+
+
+
+static void testAnotherMove(Transformation* transformation, const MoveDesc& desc, float dt) {
+	transformation->timer += dt;
+	transformation->previous = transformation->pos;
+	transformation->pos.y = (desc.data[0] * cos(transformation->timer * desc.data[1])) + (384.0f + (desc.data[2] * sin(transformation->timer * desc.data[3])));
+	transformation->pos.x = (desc.data[4] * sin(transformation->timer * desc.data[5])) + (512.0f + (desc.data[6] * cos(transformation->timer * desc.data[7])));
+	transformation->rotation = math::get_rotation(transformation->pos - transformation->previous);
+}
+
 const ds::vec2 SECTIONS[] = {
 	ds::vec2(math::deg2rad( 45.0f),math::deg2rad(135.0f)),
 	ds::vec2(math::deg2rad(135.0f),math::deg2rad(225.0f)),
@@ -26,6 +44,7 @@ Breakout::Breakout() : ds::BaseApp() {
 	_settings.clearColor = ds::Color(16, 16, 16, 255);
 	_settings.guiToggleKey = 'O';
 	_settings.synchedFrame = true;
+	_settings.guiFlags = ds::SIDE_MENU;
 	_buttonClicked[0] = false;
 	_buttonClicked[1] = false;
 	_buttonPressed[0] = false;
@@ -104,9 +123,29 @@ void Breakout::initialize() {
 	}
 	*/
 
+	_desc.data[0] = 15.0f;
+	_desc.data[1] = -6.0f;
+	_desc.data[2] = 180.0f;
+	_desc.data[3] = 1.3f;
+	_desc.data[4] = 15.0f;
+	_desc.data[5] = -6.0f;
+	_desc.data[6] = 200.0f;
+	_desc.data[7] = 1.0f / 1.5f;
+	//transformation->pos.y = (15.0f * cos(transformation->timer * -6.0f)) + (240.0f + (180.0f * sin(transformation->timer * 1.3f)));
+	//transformation->pos.x = (15.0f * sin(transformation->timer * -6.0f)) + (320.0f + (200.0f * cos(transformation->timer / 1.5f)));
+
+	_movement.pos = ds::vec2(512, 384);
+	_movement.previous = _movement.pos;
+	_movement.timer = 0.0f;
+	testMove(&_movement, 0.0f);
 	
 	_dbgRelaxation = 0.2f;
 	_dbgMinDist = 12.0f;
+
+	_moveXId = _expressionManager.parse("15.0 * cos(TIMER * -6.0) + 240.0");// +(180.0 * sin(TIMER * 1.3))");
+	//_moveXId = _expressionManager.parse("15 * TIMER");
+	float v = _expressionManager.run(_moveXId);
+	DBG_LOG("RESULT %3.2f", v);
 }
 
 // -------------------------------------------------------
@@ -213,7 +252,9 @@ void Breakout::update(float dt) {
 		_ball.reset();
 	}
 
-	_worm.move(dt, _dbgMinDist, _dbgRelaxation);
+	testAnotherMove(&_movement, _desc, dt);
+
+	_worm.move(_movement, dt, _dbgMinDist, _dbgRelaxation);
 	
 }
 
@@ -227,7 +268,7 @@ void Breakout::render() {
 		_sprites->add(_indicator.getPosition(), ds::vec4(280, 300, 120, 120), ds::vec2(1.0f), _indicator.getRotation());
 	}
 	*/
-	_worm.render(_sprites);
+	_worm.render(_movement, _sprites);
 
 	_sprites->flush();
 }
@@ -240,6 +281,11 @@ void Breakout::drawLeftPanel() {
 	}
 	gui::Input("Min dist", &_dbgMinDist);
 	gui::Input("Relaxation", &_dbgRelaxation);
+	char tmp[32];
+	for (int i = 0; i < 8; ++i) {
+		sprintf_s(tmp, "Data %d", i);
+		gui::Input(tmp, &_desc.data[i]);
+	}
 }
 
 void Breakout::handleButtons() {

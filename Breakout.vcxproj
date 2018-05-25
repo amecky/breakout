@@ -234,6 +234,7 @@
     <ClCompile Include="src\objects\DirectionIndicator.cpp" />
     <ClCompile Include="src\objects\Worm.cpp" />
     <ClCompile Include="src\scenes\MainScene.cpp" />
+    <ClCompile Include="src\utils\ExpressionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\diesel.h" />
@@ -258,6 +259,7 @@
     <ClInclude Include="src\objects\DirectionIndicator.h" />
     <ClInclude Include="src\objects\Worm.h" />
     <ClInclude Include="src\scenes\MainScene.h" />
+    <ClInclude Include="src\utils\ExpressionManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />

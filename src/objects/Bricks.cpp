@@ -4,7 +4,7 @@
 Bricks::Bricks() {
 	ID id = _bricks.add();
 	Brick& brick = _bricks.get(id);
-	brick.position = ds::vec2(512, 384);
+	brick.position = ds::vec2(500, 384);
 	brick.extent = ds::vec2(30, 15);
 	brick.aabBox = { brick.position,ds::vec2(60,40) };
 }

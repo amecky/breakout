@@ -10,6 +10,9 @@ class SpriteBatchBuffer;
 
 namespace ds {
 
+	const int TOP_MENU = 1;
+	const int SIDE_MENU = 2;
+	const int BOTTOM_MENU = 4;
 	// ----------------------------------------------------
 	// Application settings
 	// ----------------------------------------------------
@@ -24,6 +27,7 @@ namespace ds {
 		char updateToggleKey;
 		char singleStepKey;
 		bool synchedFrame;
+		int guiFlags;
 	};
 
 	// ----------------------------------------------------
@@ -361,6 +365,7 @@ namespace ds {
 		_settings.updateToggleKey = 'U';
 		_settings.singleStepKey = 'P';
 		_settings.synchedFrame = false;
+		_settings.guiFlags = 7;
 		_events = new ds::EventStream;
 		_loadTimer = 0.0f;
 		_useTweakables = false;
@@ -625,38 +630,48 @@ namespace ds {
 			//
 			// top panel
 			//
-			p2i sp = p2i(10, ds::getScreenHeight() - 10);
-			gui::start(&sp, ds::getScreenWidth());
-			gui::moveForward(p2i(0, 10));
-			gui::beginGroup();
-			drawTopPanel();
-			it = _scenes.begin();
-			while (it != _scenes.end()) {
-				(*it)->drawTopPanel();
-				++it;
+			if ((_settings.guiFlags & TOP_MENU) == TOP_MENU) {
+				p2i sp = p2i(10, ds::getScreenHeight() - 10);
+				gui::start(&sp, ds::getScreenWidth());
+				gui::moveForward(p2i(0, 10));
+				gui::beginGroup();
+				drawTopPanel();
+				it = _scenes.begin();
+				while (it != _scenes.end()) {
+					(*it)->drawTopPanel();
+					++it;
+				}
+				gui::endGroup();
+				gui::end();
 			}
-			gui::endGroup();
-			gui::end();
-			//
-			// left panel
-			//
-			sp = p2i(ds::getScreenWidth() - 385, ds::getScreenHeight() - 50);
-			gui::start(&sp, 385);
-			drawLeftPanel();
-			it = _scenes.begin();
-			while (it != _scenes.end()) {
-				
-				(*it)->drawLeftPanel();
-				++it;
+			if ((_settings.guiFlags & SIDE_MENU) == SIDE_MENU) {
+				//
+				// left panel
+				//
+				int topOffset = 50;
+				if ((_settings.guiFlags & TOP_MENU) != TOP_MENU) {
+					topOffset = 10;
+				}
+				p2i sp = p2i(ds::getScreenWidth() - 385, ds::getScreenHeight() - topOffset);
+				gui::start(&sp, 385);
+				drawLeftPanel();
+				it = _scenes.begin();
+				while (it != _scenes.end()) {
+
+					(*it)->drawLeftPanel();
+					++it;
+				}
+				gui::end();
 			}
-			gui::end();
 			//
 			// bottom panel
 			//
-			sp = p2i(0, ds::getScreenHeight() - 160);
-			gui::start(&sp, ds::getScreenWidth());
-			drawBottomPanel();
-			gui::end();
+			if ((_settings.guiFlags & BOTTOM_MENU) == BOTTOM_MENU) {
+				p2i sp = p2i(0, ds::getScreenHeight() - 160);
+				gui::start(&sp, ds::getScreenWidth());
+				drawBottomPanel();
+				gui::end();
+			}
 		}
 		// handle events if active
 		if (doUpdate) {

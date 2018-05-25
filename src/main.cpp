@@ -22,6 +22,8 @@
 #include <ds_logpanel.h>
 #define PH_INTERSECTION_IMPLEMENTATION
 #include <ds_intersection.h>
+#define DS_VM_IMPLEMENTATION
+#include <ds_vm.h>
 
 extern ds::BaseApp* app;
 

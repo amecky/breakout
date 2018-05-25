@@ -21,6 +21,9 @@
     <ClCompile Include="src\objects\Worm.cpp">
       <Filter>objects</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils\ExpressionManager.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -84,6 +87,9 @@
     </ClInclude>
     <ClInclude Include="src\objects\Worm.h">
       <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\ExpressionManager.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +158,9 @@
     </Filter>
     <Filter Include="lib">
       <UniqueIdentifier>{26c8947b-6109-494f-b9ee-fbfddd6c54a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{8a27a9e9-7859-4919-85db-b17255346586}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
