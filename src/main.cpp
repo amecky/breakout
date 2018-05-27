@@ -49,7 +49,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 		app->tick(dt);
 
-		ds::dbgPrint(0, 34, "FPS: %d", ds::getFramesPerSecond());
+		ds::dbgPrint(0, 1, "FPS: %d", ds::getFramesPerSecond());
 
 		ds::end();
 

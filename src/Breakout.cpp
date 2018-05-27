@@ -44,14 +44,20 @@ Breakout::Breakout() : ds::BaseApp() {
 	_settings.clearColor = ds::Color(16, 16, 16, 255);
 	_settings.guiToggleKey = 'O';
 	_settings.synchedFrame = true;
-	_settings.guiFlags = ds::SIDE_MENU;
+	_settings.guiFlags = ds::SIDE_MENU | ds::BOTTOM_MENU;
 	_buttonClicked[0] = false;
 	_buttonClicked[1] = false;
 	_buttonPressed[0] = false;
 	_buttonPressed[1] = false;
 	_dbgFollow = false;
 
-	
+	_settings.guiSettings = ds::GUIDesc()
+		.Enabled(true)
+		.SideMenuEnabled(true)
+		.SideMenuPosition(p2i(724, 750))
+		.BottomMenuEnabled(true)
+		.BottomMenuPosition(p2i(10, 80))
+		.getSettings();
 }
 
 Breakout::~Breakout() {
@@ -142,8 +148,10 @@ void Breakout::initialize() {
 	_dbgRelaxation = 0.2f;
 	_dbgMinDist = 12.0f;
 
-	_moveXId = _expressionManager.parse("15.0 * cos(TIMER * -6.0) + 240.0");// +(180.0 * sin(TIMER * 1.3))");
-	//_moveXId = _expressionManager.parse("15 * TIMER");
+	sprintf_s(_moveYStr, "%s", "15.0 * cos(TIMER * -6.0) + 240.0 +(180.0 * sin(TIMER * 1.3))");
+	_moveYId = _expressionManager.parse(_moveYStr);
+	sprintf_s(_moveXStr, "%s", "15.0 * sin(TIMER * -6.0) + 320.0 +(200.0 * cos(TIMER / 1.5))");
+	_moveXId = _expressionManager.parse(_moveXStr);
 	float v = _expressionManager.run(_moveXId);
 	DBG_LOG("RESULT %3.2f", v);
 }
@@ -252,8 +260,13 @@ void Breakout::update(float dt) {
 		_ball.reset();
 	}
 
-	testAnotherMove(&_movement, _desc, dt);
-
+	//testAnotherMove(&_movement, _desc, dt);
+	_movement.timer += dt;
+	_movement.previous = _movement.pos;	
+	_expressionManager.setVariable("TIMER", _movement.timer);
+	_movement.pos.x = _expressionManager.run(_moveXId);
+	_movement.pos.y = _expressionManager.run(_moveYId);
+	_movement.rotation = math::get_rotation(_movement.pos - _movement.previous);
 	_worm.move(_movement, dt, _dbgMinDist, _dbgRelaxation);
 	
 }
@@ -281,10 +294,16 @@ void Breakout::drawLeftPanel() {
 	}
 	gui::Input("Min dist", &_dbgMinDist);
 	gui::Input("Relaxation", &_dbgRelaxation);
-	char tmp[32];
-	for (int i = 0; i < 8; ++i) {
-		sprintf_s(tmp, "Data %d", i);
-		gui::Input(tmp, &_desc.data[i]);
+	
+}
+
+void Breakout::drawBottomPanel() {
+	gui::begin("Movement", 0);
+	if (gui::Input("Move X", _moveXStr, 64)) {
+		_expressionManager.parse(_moveXId, _moveXStr);
+	}
+	if (gui::Input("Move Y", _moveYStr, 64)) {
+		_expressionManager.parse(_moveYId, _moveYStr);
 	}
 }
 

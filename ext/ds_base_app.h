@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include <vector>
 #include <stdint.h>
-
+#include <ds_imgui.h>
 //#define BASE_APP_IMPLEMENTATION
 
 class SpriteBatchBuffer;
@@ -13,6 +13,63 @@ namespace ds {
 	const int TOP_MENU = 1;
 	const int SIDE_MENU = 2;
 	const int BOTTOM_MENU = 4;
+
+	struct GUISettings {
+		bool enabled;
+		p2i topPosition;
+		p2i sidePosition;
+		p2i bottomPosition;
+		bool topMenuEnabled;
+		bool sideMenuEnabled;
+		bool bottomMenuEnabled;
+	};
+
+	class GUIDesc {
+
+	public:
+		GUIDesc() {
+			_settings.enabled = false;
+			_settings.topMenuEnabled = false;
+			_settings.sideMenuEnabled = false;
+			_settings.bottomMenuEnabled = false;
+			_settings.topPosition = p2i(0, 0);
+			_settings.sidePosition = p2i(0, 0);
+			_settings.bottomPosition = p2i(0, 100);
+		}
+		GUIDesc& Enabled(bool enabled) {
+			_settings.enabled = enabled;
+			return *this;
+		}
+		GUIDesc& TopMenuEnabled(bool enabled) {
+			_settings.topMenuEnabled = enabled;
+			return *this;
+		}
+		GUIDesc& SideMenuEnabled(bool enabled) {
+			_settings.sideMenuEnabled = enabled;
+			return *this;
+		}
+		GUIDesc& BottomMenuEnabled(bool enabled) {
+			_settings.bottomMenuEnabled = enabled;
+			return *this;
+		}
+		GUIDesc& TopMenuPosition(const p2i& pos) {
+			_settings.topPosition = pos;
+			return *this;
+		}
+		GUIDesc& SideMenuPosition(const p2i& pos) {
+			_settings.sidePosition = pos;
+			return *this;
+		}
+		GUIDesc& BottomMenuPosition(const p2i& pos) {
+			_settings.bottomPosition = pos;
+			return *this;
+		}
+		const GUISettings& getSettings() const {
+			return _settings;
+		}
+	private:
+		GUISettings _settings;
+	};
 	// ----------------------------------------------------
 	// Application settings
 	// ----------------------------------------------------
@@ -28,6 +85,7 @@ namespace ds {
 		char singleStepKey;
 		bool synchedFrame;
 		int guiFlags;
+		GUISettings guiSettings;
 	};
 
 	// ----------------------------------------------------
@@ -280,10 +338,6 @@ namespace ds {
 extern ds::BaseApp* app;
 
 #ifdef BASE_APP_IMPLEMENTATION
-//#include <SpriteBatchBuffer.h>
-//#include <stb_image.h>
-//#include <ds_tweakable.h>
-//#include <ds_imgui.h>
 
 namespace ds {
 
@@ -626,12 +680,12 @@ namespace ds {
 			++it;
 		}
 		// render GUI if active
-		if (_settings.useIMGUI && _guiActive) {
+		if (_settings.guiSettings.enabled && _guiActive) {
 			//
 			// top panel
 			//
-			if ((_settings.guiFlags & TOP_MENU) == TOP_MENU) {
-				p2i sp = p2i(10, ds::getScreenHeight() - 10);
+			if (_settings.guiSettings.topMenuEnabled) {
+				p2i sp = _settings.guiSettings.topPosition;
 				gui::start(&sp, ds::getScreenWidth());
 				gui::moveForward(p2i(0, 10));
 				gui::beginGroup();
@@ -644,15 +698,11 @@ namespace ds {
 				gui::endGroup();
 				gui::end();
 			}
-			if ((_settings.guiFlags & SIDE_MENU) == SIDE_MENU) {
+			if (_settings.guiSettings.sideMenuEnabled) {
 				//
 				// left panel
 				//
-				int topOffset = 50;
-				if ((_settings.guiFlags & TOP_MENU) != TOP_MENU) {
-					topOffset = 10;
-				}
-				p2i sp = p2i(ds::getScreenWidth() - 385, ds::getScreenHeight() - topOffset);
+				p2i sp = _settings.guiSettings.sidePosition;
 				gui::start(&sp, 385);
 				drawLeftPanel();
 				it = _scenes.begin();
@@ -666,8 +716,9 @@ namespace ds {
 			//
 			// bottom panel
 			//
-			if ((_settings.guiFlags & BOTTOM_MENU) == BOTTOM_MENU) {
-				p2i sp = p2i(0, ds::getScreenHeight() - 160);
+			if (_settings.guiSettings.bottomMenuEnabled) {
+				//p2i sp = p2i(0, ds::getScreenHeight() - 160);
+				p2i sp = _settings.guiSettings.bottomPosition;
 				gui::start(&sp, ds::getScreenWidth());
 				drawBottomPanel();
 				gui::end();

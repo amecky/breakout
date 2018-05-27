@@ -1119,6 +1119,25 @@ namespace gui {
 	}
 
 	// -------------------------------------------------------
+	// determine text size
+	// -------------------------------------------------------
+	static int findTextPos(const char* txt, int pos) {
+		size_t l = strlen(txt);
+		int x = 0;
+		for (int i = 0; i < l; ++i) {
+			if (x > pos) {
+				int r = i - 1;
+				if (r < 0) {
+					r = 0;
+				}
+				return r;
+			}
+			x += 8;
+		}
+		return l;
+	}
+
+	// -------------------------------------------------------
 	// initialize GUI
 	// -------------------------------------------------------
 	void init(IMGUISettings* settings) {
@@ -1246,8 +1265,11 @@ namespace gui {
 		p2i p = _guiCtx->currentPos;
 		checkItem(p, p2i(width, 20));
 		if (isClicked()) {
+			p2i mousePosition = _guiCtx->mousePosition;
+			int dx = mousePosition.x - p.x - 6; // 10 px offset - half font width
 			sprintf_s(_guiCtx->inputText, 256, "%s", v);
 			_guiCtx->caretPos = strlen(_guiCtx->inputText);
+			_guiCtx->caretPos = findTextPos(_guiCtx->inputText, dx);
 			_guiCtx->inputItem = _guiCtx->idStack.last();
 			_guiCtx->activeItem = _guiCtx->idStack.last();
 		}

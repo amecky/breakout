@@ -33,6 +33,7 @@ public:
 	void update(float dt);
 	void render();
 	void drawLeftPanel();
+	void drawBottomPanel();
 private:
 	void handleButtons();
 	bool _buttonPressed[2];
@@ -53,4 +54,7 @@ private:
 	float _dbgMinDist;
 	ExpressionManager _expressionManager;
 	int _moveXId;
+	int _moveYId;
+	char _moveXStr[128];
+	char _moveYStr[128];
 };

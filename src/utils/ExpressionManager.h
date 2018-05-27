@@ -11,7 +11,10 @@ class ExpressionManager {
 
 public:
 	ExpressionManager();
+	~ExpressionManager();
+	void setVariable(const char* name, float value);
 	int parse(const char* expression);
+	void parse(int expressionID, const char* expression);
 	float run(int index);
 private:
 	std::vector<Expression> _expressions;

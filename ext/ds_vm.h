@@ -23,7 +23,7 @@
 	else {
 		printf("Error: %s\n", vm_get_error(code));
 	}
-	vm_free(ctx);
+	vm_destroy_context(ctx);
 
 	Release notes:
 
@@ -81,6 +81,7 @@ extern "C" {
 	struct vm_variable_t {
 		int hash;
 		float value;
+		const char* name;
 	};
 
 	typedef struct vm_variable_t vm_variable;
@@ -90,6 +91,7 @@ extern "C" {
 		vmFunction function;
 		int precedence;
 		int num_parameters;
+		const char* name;
 	};
 
 	typedef struct vm_function_t vm_function;
@@ -197,6 +199,7 @@ DSDEF int vm_add_variable(vm_context* ctx, const char* name, float value) {
 	vm_variable* v = &ctx->variables[ctx->num_variables++];
 	v->hash = vm__fnv1a(name);
 	v->value = value;
+	v->name = name;
 	return  ctx->num_variables - 1;
 }
 
@@ -219,6 +222,7 @@ static int vm__add_variable(vm_context* ctx, const char* name, int length, float
 	vm_variable* v = &ctx->variables[ctx->num_variables++];
 	v->hash = vm__build_hash(name, length);
 	v->value = value;
+	v->name = name;
 	return  ctx->num_variables - 1;
 }
 
@@ -231,6 +235,7 @@ DSDEF void vm_add_function(vm_context* ctx, const char* name, vmFunction func, i
 	f->function = func;
 	f->precedence = precedence;
 	f->num_parameters = num_params;
+	f->name = name;
 }
 
 // ------------------------------------------------------------------
@@ -396,6 +401,10 @@ static vm_token vm__token_for_identifier(vm_context* ctx, const char *identifier
 	}
 }
 
+static vm_token vm__token_for_identifier2(vm_context* ctx, const char *identifier) {
+	return vm__token_for_identifier(ctx, identifier, strlen(identifier));
+}
+
 // ------------------------------------------------------------------
 // internal method to check wether there is a known function
 // ------------------------------------------------------------------
@@ -486,7 +495,7 @@ vm_token vm__create_token_with_value(vm_token_type type, float value) {
 // parse
 // ------------------------------------------------------------------
 DSDEF int vm_parse(vm_context* ctx, const char * source, vm_token * byteCode, int capacity) {
-	int binary = 1;
+	int binary = 0;
 	const char* p = source;
 	unsigned num_tokens = 0;
 	unsigned overflow_tokens = 0;
@@ -498,22 +507,22 @@ DSDEF int vm_parse(vm_context* ctx, const char * source, vm_token * byteCode, in
 			char *out;
 			token = vm__create_token_with_value(TOK_NUMBER, vm__strtof(p, &out));
 			p = out;
-			binary = 0;
+			binary = 1;
 		}
 		else if ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_')) {
 			const char *identifier = p;
 			while ((*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z') || (*p == '_') || (*p >= '0' && *p <= '9'))
 				p++;
 			token = vm__token_for_identifier(ctx, identifier, p - identifier);
-			binary = 0;
+			binary = 1;
 		}
 		else {
 			switch (*p) {
-			case '(': token = vm__create_token(TOK_LEFT_PARENTHESIS); binary = 1; break;
-				case ')': token = vm__create_token(TOK_RIGHT_PARENTHESIS); binary = 0; break;
+				case '(': token = vm__create_token(TOK_LEFT_PARENTHESIS); binary = 0; break;
+				case ')': token = vm__create_token(TOK_RIGHT_PARENTHESIS); binary = 1; break;
 				case ' ': case '\t': case '\n': case '\r': break;
-				case '-': token = vm__token_for_identifier(ctx, binary == 0 ? "-" : "u-", 1 + binary); binary = 1; break;
-				case '+': token = vm__token_for_identifier(ctx, binary == 0 ? "+" : "u+", 1 + binary); binary = 1; break;
+				case '-': token = vm__token_for_identifier2(ctx, binary == 1 ? "-" : "u-"); binary = 0; break;
+				case '+': token = vm__token_for_identifier2(ctx, binary == 1 ? "+" : "u+"); binary = 0; break;
 				default: {
 					char s1[2] = { *p,0 };
 					char s2[3] = { *p, *(p + 1), 0 };
@@ -610,10 +619,19 @@ DSDEF int vm_run(vm_context* ctx, vm_token* byteCode, int capacity, float* ret) 
 	return 1;
 }
 
-DSDEF void vm_debug(vm_token* tokens, int num) {
+DSDEF void vm_debug(vm_context* ctx, vm_token* tokens, int num) {
 	printf("bytecode: \n");
 	for (int i = 0; i < num; ++i) {
-		printf("%d : %s %d %g\n", i, TOKEN_NAMES[tokens[i].type], tokens[i].id, tokens[i].value);
+		printf("%d : %s ", i, TOKEN_NAMES[tokens[i].type]);
+		if (tokens[i].type == TOK_FUNCTION) {
+			printf("%s\n", ctx->functions[tokens[i].id].name);
+		}
+		else if (tokens[i].type == TOK_NUMBER) {
+			printf("%g\n", tokens[i].value);
+		}
+		else if (tokens[i].type == TOK_VARIABLE) {
+			printf("%s %g\n", ctx->variables[tokens[i].id].name, tokens[i].value);
+		}
 	}
 }
 
