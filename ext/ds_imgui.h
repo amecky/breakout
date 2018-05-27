@@ -1282,10 +1282,12 @@ namespace gui {
 			p2i textDim = textSize(_guiCtx->inputText);
 			p2i cp = p;
 			p2i cursorPos = limitedTextSize(_guiCtx->inputText, _guiCtx->caretPos);
-			cp.x += (width - textDim.x) /2 + cursorPos.x - 2;
+			//cp.x += (width - textDim.x) /2 + cursorPos.x - 2;
+			cp.x = cursorPos.x + 16;
 			cp.y -= 6;
 			renderer::add_box(_guiCtx->uiContext, cp, p2i(10, 3), ds::Color(192, 0, 192, 255));
-			p.x += (width - textDim.x) / 2;
+			//p.x += (width - textDim.x) / 2;
+			p.x += 10;
 			p.y -= 1;
 			renderer::add_text(_guiCtx->uiContext, p, _guiCtx->inputText, 0);
 			sprintf_s(v, maxLength, "%s", _guiCtx->inputText);
@@ -1295,7 +1297,8 @@ namespace gui {
 			renderer::add_box(_guiCtx->uiContext, p, p2i(width, 16), _guiCtx->settings.inputBoxColor);
 			p2i textDim = textSize(_guiCtx->tmpBuffer);
 			p.y -= 1;
-			p.x += (width - textDim.x) / 2;
+			//p.x += (width - textDim.x) / 2;
+			p.x += 10;
 			renderer::add_text(_guiCtx->uiContext, p, _guiCtx->tmpBuffer, 0);
 		}
 		return ret;

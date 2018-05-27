@@ -42,7 +42,7 @@ Breakout::Breakout() : ds::BaseApp() {
 	_settings.windowTitle = "breakout";
 	_settings.useIMGUI = true;
 	_settings.clearColor = ds::Color(16, 16, 16, 255);
-	_settings.guiToggleKey = 'O';
+	_settings.guiToggleKey = '=';
 	_settings.synchedFrame = true;
 	_settings.guiFlags = ds::SIDE_MENU | ds::BOTTOM_MENU;
 	_buttonClicked[0] = false;
@@ -150,7 +150,8 @@ void Breakout::initialize() {
 
 	sprintf_s(_moveYStr, "%s", "15.0 * cos(TIMER * -6.0) + 240.0 +(180.0 * sin(TIMER * 1.3))");
 	_moveYId = _expressionManager.parse(_moveYStr);
-	sprintf_s(_moveXStr, "%s", "15.0 * sin(TIMER * -6.0) + 320.0 +(200.0 * cos(TIMER / 1.5))");
+	//sprintf_s(_moveXStr, "%s", "15.0 * sin(TIMER * -6.0) + 320.0 +(200.0 * cos(TIMER / 1.5))");
+	sprintf_s(_moveXStr, "%s", "1100 - abs(sin(TIMER) * 1000)");
 	_moveXId = _expressionManager.parse(_moveXStr);
 	float v = _expressionManager.run(_moveXId);
 	DBG_LOG("RESULT %3.2f", v);

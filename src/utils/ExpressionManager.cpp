@@ -4,6 +4,8 @@
 ExpressionManager::ExpressionManager() {
 	_vmCtx = vm_create_context();
 	vm_add_variable(_vmCtx, "TIMER", 0.0f);
+	vm_add_variable(_vmCtx, "PI", ds::PI);
+	vm_add_variable(_vmCtx, "TWO_PI", ds::TWO_PI);
 }
 
 ExpressionManager::~ExpressionManager() {
