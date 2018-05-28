@@ -18,6 +18,15 @@ struct Segment {
 	float rotation;
 };
 
+class Ship {
+
+public:
+	Ship() {}
+	void render(const Transformation& movement, SpriteBatchBuffer* sprites);
+private:
+
+};
+
 class Worm {
 	
 public:

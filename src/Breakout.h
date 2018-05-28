@@ -47,8 +47,10 @@ private:
 	Bricks _bricks;
 	DirectionIndicator _indicator;
 	Transformation _movement;
+	Transformation _shipMovement;
 	MoveDesc _desc;
 	Worm _worm;
+	Ship _ship;
 	bool _dbgFollow;
 	float _dbgRelaxation;
 	float _dbgMinDist;

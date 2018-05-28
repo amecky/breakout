@@ -143,15 +143,20 @@ void Breakout::initialize() {
 	_movement.pos = ds::vec2(512, 384);
 	_movement.previous = _movement.pos;
 	_movement.timer = 0.0f;
+
+	_shipMovement.pos = ds::vec2(512, 384);
+	_shipMovement.previous = _movement.pos;
+	_shipMovement.timer = 0.0f;
+
 	testMove(&_movement, 0.0f);
 	
 	_dbgRelaxation = 0.2f;
 	_dbgMinDist = 12.0f;
 
-	sprintf_s(_moveYStr, "%s", "15.0 * cos(TIMER * -6.0) + 240.0 +(180.0 * sin(TIMER * 1.3))");
+	sprintf_s(_moveYStr, "%s", "15.0 * cos(TIMER * -6.0) + 320.0 +(180.0 * sin(TIMER * 1.3))");
 	_moveYId = _expressionManager.parse(_moveYStr);
-	//sprintf_s(_moveXStr, "%s", "15.0 * sin(TIMER * -6.0) + 320.0 +(200.0 * cos(TIMER / 1.5))");
-	sprintf_s(_moveXStr, "%s", "1100 - abs(sin(TIMER) * 1000)");
+	sprintf_s(_moveXStr, "%s", "15.0 * sin(TIMER * -6.0) + 320.0 +(200.0 * cos(TIMER / 1.5))");
+	//sprintf_s(_moveXStr, "%s", "1100 - abs(sin(TIMER) * 1000)");
 	_moveXId = _expressionManager.parse(_moveXStr);
 	float v = _expressionManager.run(_moveXId);
 	DBG_LOG("RESULT %3.2f", v);
@@ -283,6 +288,8 @@ void Breakout::render() {
 	}
 	*/
 	_worm.render(_movement, _sprites);
+
+	_ship.render(_shipMovement, _sprites);
 
 	_sprites->flush();
 }

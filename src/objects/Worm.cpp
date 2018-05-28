@@ -52,3 +52,16 @@ void Worm::render(const Transformation& movement, SpriteBatchBuffer * sprites) {
 	}
 }
 
+void Ship::render(const Transformation & movement, SpriteBatchBuffer * sprites) {
+	ds::vec2 p = movement.pos;
+	float start = ds::PI * 0.25f;
+	float step = ds::PI / 7.0f * 1.5f;
+	float angle = start;
+	for (int i = 0; i < 8; ++i) {
+		ds::vec2 np = add_radial(p, angle, 25.0f);
+		sprites->add(np, ds::vec4(480, 0, 48, 48), ds::vec2(1.0f), 0.0f, ds::Color(12, 198, 215, 192));
+		sprites->add(np, ds::vec4(480, 0, 48, 48), ds::vec2(0.5f, 0.2f), angle, ds::Color(49, 237, 191, 255));
+		sprites->add(np, ds::vec4(480, 0, 48, 48), ds::vec2(0.6f, 0.6f), angle, ds::Color(192, 0, 0, 255));		
+		angle += step;
+	}
+}
