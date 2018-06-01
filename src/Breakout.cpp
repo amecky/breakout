@@ -54,7 +54,7 @@ Breakout::Breakout() : ds::BaseApp() {
 	_settings.guiSettings = ds::GUIDesc()
 		.Enabled(true)
 		.SideMenuEnabled(true)
-		.SideMenuPosition(p2i(724, 750))
+		.SideMenuPosition(p2i(650, 750))
 		.BottomMenuEnabled(true)
 		.BottomMenuPosition(p2i(10, 80))
 		.getSettings();
@@ -152,6 +152,7 @@ void Breakout::initialize() {
 	
 	_dbgRelaxation = 0.2f;
 	_dbgMinDist = 12.0f;
+	_dbgIndex = 0;
 
 	sprintf_s(_moveYStr, "%s", "15.0 * cos(TIMER * -6.0) + 320.0 +(180.0 * sin(TIMER * 1.3))");
 	_moveYId = _expressionManager.parse(_moveYStr);
@@ -302,7 +303,23 @@ void Breakout::drawLeftPanel() {
 	}
 	gui::Input("Min dist", &_dbgMinDist);
 	gui::Input("Relaxation", &_dbgRelaxation);
-	
+
+	gui::Value("Segments", _ship.num());
+	gui::Slider("Index", &_dbgIndex, 0, _ship.num());
+	if (_dbgIndex != -1) {
+		Segment& seg = _ship.getSegment(_dbgIndex);
+		gui::Input("Color", &seg.color);
+		gui::Input("Pos", &seg.pos);
+		gui::Input("Scale", &seg.scale);
+		gui::SliderAngle("Rotation", &seg.rotation);
+	}
+	gui::beginGroup();
+	if (gui::Button("Add")) {
+		_dbgIndex = _ship.add();
+	}
+	if (gui::Button("Remove")) {
+		_dbgIndex = _ship.remove(_dbgIndex);
+	}
 }
 
 void Breakout::drawBottomPanel() {

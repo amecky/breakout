@@ -51,17 +51,49 @@ void Worm::render(const Transformation& movement, SpriteBatchBuffer * sprites) {
 		sprites->add(_segments[i].pos, ds::vec4(480, 0, 48, 48), ds::vec2(0.6f), _segments[i].rotation, ds::Color(192, 128, 0, 255));
 	}
 }
-
+/*
 void Ship::render(const Transformation & movement, SpriteBatchBuffer * sprites) {
-	ds::vec2 p = movement.pos;
+*/
+Ship::Ship() {
+	ds::vec2 p(0.0f);
 	float start = ds::PI * 0.25f;
 	float step = ds::PI / 7.0f * 1.5f;
 	float angle = start;
 	for (int i = 0; i < 8; ++i) {
 		ds::vec2 np = add_radial(p, angle, 25.0f);
-		sprites->add(np, ds::vec4(480, 0, 48, 48), ds::vec2(1.0f), 0.0f, ds::Color(12, 198, 215, 192));
-		sprites->add(np, ds::vec4(480, 0, 48, 48), ds::vec2(0.5f, 0.2f), angle, ds::Color(49, 237, 191, 255));
-		sprites->add(np, ds::vec4(480, 0, 48, 48), ds::vec2(0.6f, 0.6f), angle, ds::Color(192, 0, 0, 255));		
+		_segments[_num++] = { np, 0.0f, ds::vec2(1.0f), ds::Color(12, 198, 215, 192), -1 };
+		_segments[_num++] = { np, angle, ds::vec2(0.5f, 0.2f), ds::Color(49, 237, 191, 255), -1 };
+		_segments[_num++] = { np, angle, ds::vec2(0.6f, 0.6f), ds::Color(192, 0, 0, 255), -1 };
 		angle += step;
 	}
+}
+
+
+void Enemy::render(const Transformation & movement, SpriteBatchBuffer * sprites) {
+	ds::vec2 p = movement.pos;
+	for (int i = 0; i < _num; ++i) {
+		const Segment& s = _segments[i];
+		sprites->add(p + s.pos, ds::vec4(480, 0, 48, 48), s.scale, s.rotation, s.color);
+	}
+}
+
+int Enemy::add() {
+	if (_num < 32) {
+		Segment& s = _segments[_num++];
+		s.pos = ds::vec2(0.0f);
+		s.color = ds::Color(255, 255, 255, 255);
+		s.rotation = 0.0f;
+		s.scale = ds::vec2(1.0f);
+		s.timer = 0.0f;
+		return _num - 1;
+	}
+	return -1;
+}
+int Enemy::remove(int index) {
+	if (_num > 0) {
+		_segments[index] = _segments[_num - 1];
+		--_num;
+		return _num;
+	}
+	return -1;
 }

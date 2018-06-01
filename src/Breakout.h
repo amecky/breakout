@@ -54,6 +54,7 @@ private:
 	bool _dbgFollow;
 	float _dbgRelaxation;
 	float _dbgMinDist;
+	int _dbgIndex;
 	ExpressionManager _expressionManager;
 	int _moveXId;
 	int _moveYId;
