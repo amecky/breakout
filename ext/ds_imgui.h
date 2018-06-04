@@ -506,11 +506,18 @@ namespace gui {
 			ds::vec2 textureSize = ds::getTextureSize(textureID);
 			ctx->sprites.constantBuffer.screenCenter = ds::vec4(static_cast<float>(ds::getScreenWidth() / 2), static_cast<float>(ds::getScreenHeight() / 2), textureSize.x, textureSize.y);
 
-			ds::ShaderInfo vsInfo = { 0 , gui_VS_Main, sizeof(gui_VS_Main), ds::ShaderType::ST_VERTEX_SHADER };
-			RID vertexShader = ds::createShader(vsInfo, "GUI_VS");
-			ds::ShaderInfo psInfo = { 0 , gui_PS_Main, sizeof(gui_PS_Main), ds::ShaderType::ST_PIXEL_SHADER };
-			RID pixelShader = ds::createShader(psInfo, "GUI_PS");
-
+			RID vertexShader = ds::createShader(ds::ShaderDesc()
+				.Data(gui_VS_Main)
+				.DataSize(sizeof(gui_VS_Main))
+				.ShaderType(ds::ShaderType::ST_VERTEX_SHADER)
+				, "GUI_VS"
+			);
+			RID pixelShader = ds::createShader(ds::ShaderDesc()
+				.Data(gui_PS_Main)
+				.DataSize(sizeof(gui_PS_Main))
+				.ShaderType(ds::ShaderType::ST_PIXEL_SHADER)
+				, "GUI_PS"
+			);
 			RID bs_id = ds::createBlendState(ds::BlendStateDesc()
 				.SrcBlend(ds::BlendStates::SRC_ALPHA)
 				.SrcAlphaBlend(ds::BlendStates::SRC_ALPHA)

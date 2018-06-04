@@ -22,6 +22,11 @@ struct Paddle {
 	float timer;
 };
 
+struct EnemySpriteBatchConstantBuffer {
+	ds::vec4 screenCenter;
+	ds::matrix wvp;
+	ds::vec4 data;
+};
 
 
 class Breakout : public ds::BaseApp {
@@ -42,12 +47,16 @@ private:
 	bool _mousePressed;
 	bool _rightButtonPressed;
 	SpriteBatchBuffer* _sprites;
+	SpriteBatchBuffer* _enemySprites;
+	EnemySpriteBatchConstantBuffer _enemyConstantBuffer;
 	Paddle _paddle;
 	Ball _ball;
 	Bricks _bricks;
 	DirectionIndicator _indicator;
 	Transformation _movement;
 	Transformation _shipMovement;
+	Transformation _hexagonMovement;
+	Hexagon _hexagon;
 	MoveDesc _desc;
 	Worm _worm;
 	Ship _ship;

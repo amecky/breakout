@@ -3,6 +3,8 @@
 #include "lib\math.h"
 #include "lib\AABBox.h"
 #include <ds_intersection.h>
+#include <EnemySprites_VS_Main.h>
+#include <EnemySprites_PS_Main.h>
 
 static void testMove(Transformation* transformation, float dt) {
 	transformation->timer += dt;
@@ -80,6 +82,48 @@ void Breakout::initialize() {
 		.Texture(textureID)
 		.BlendState(blendState)
 	);
+
+	RID vertexShader = ds::createShader(ds::ShaderDesc()
+		.Data(EnemySprites_VS_Main)
+		.DataSize(sizeof(EnemySprites_VS_Main))
+		.ShaderType(ds::ShaderType::ST_VERTEX_SHADER)
+	);
+	RID pixelShader = ds::createShader(ds::ShaderDesc()
+		.Data(EnemySprites_PS_Main)
+		.DataSize(sizeof(EnemySprites_PS_Main))
+		.ShaderType(ds::ShaderType::ST_PIXEL_SHADER)
+	);
+
+	_enemyConstantBuffer.screenCenter = { static_cast<float>(ds::getScreenWidth()) / 2.0f, static_cast<float>(ds::getScreenHeight()) / 2.0f, 1024.0f,1024.0f };
+	_enemyConstantBuffer.data = ds::vec4(0.0f);
+
+	ds::matrix orthoView = ds::matIdentity();
+	ds::matrix orthoProjection = ds::matOrthoLH(1024.0f, 768.0f, 0.1f, 1.0f);
+	ds::Camera camera = {
+		orthoView,
+		orthoProjection,
+		orthoView * orthoProjection,
+		ds::vec3(0,0,0),
+		ds::vec3(0,0,0),
+		ds::vec3(0,1,0),
+		ds::vec3(1,0,0),
+		0.0f,
+		0.0f,
+		0.0f
+	};
+
+	_enemyConstantBuffer.wvp = ds::matTranspose(camera.viewProjectionMatrix);
+	RID constantBuffer = ds::createConstantBuffer(sizeof(EnemySpriteBatchConstantBuffer), &_enemyConstantBuffer);
+
+	_enemySprites = new SpriteBatchBuffer(SpriteBatchDesc()
+		.MaxSprites(2048)
+		.Texture(textureID)
+		.BlendState(blendState)
+		.PixelShader(pixelShader)
+		.VertexShader(vertexShader)
+		.ConstantBuffer(constantBuffer)
+	);
+
 	_paddle.position = ds::vec2(512, 80);
 	_paddle.texture = ds::vec4(80, 200, 102, 30);
 
@@ -148,6 +192,10 @@ void Breakout::initialize() {
 	_shipMovement.previous = _movement.pos;
 	_shipMovement.timer = 0.0f;
 
+	_hexagonMovement.pos = ds::vec2(200, 600);
+	_hexagonMovement.previous = _hexagonMovement.pos;
+	_hexagonMovement.timer = 0.0f;
+
 	testMove(&_movement, 0.0f);
 	
 	_dbgRelaxation = 0.2f;
@@ -167,6 +215,8 @@ void Breakout::initialize() {
 // Update
 // -------------------------------------------------------
 void Breakout::update(float dt) {
+
+	_enemyConstantBuffer.data.x += dt;
 
 	handleButtons();
 
@@ -276,9 +326,21 @@ void Breakout::update(float dt) {
 	_movement.rotation = math::get_rotation(_movement.pos - _movement.previous);
 	_worm.move(_movement, dt, _dbgMinDist, _dbgRelaxation);
 	
+	_ship.tick(dt);
+	_ship.update(dt);
 }
 
 void Breakout::render() {
+
+	// http://twvideo01.ubm-us.net/o1/vault/gdc2015/presentations/ViktorLidholt_Advanced_Visual_Effects_in_2D_Games.pdf
+
+	_enemySprites->begin();
+	
+	_enemySprites->add(ds::vec2(512,180), ds::vec4(0, 600, 120, 120));
+
+	_enemySprites->flush();
+
+
 	_sprites->begin();
 	/*
 	_sprites->add(_paddle.position, _paddle.texture);
@@ -288,9 +350,12 @@ void Breakout::render() {
 		_sprites->add(_indicator.getPosition(), ds::vec4(280, 300, 120, 120), ds::vec2(1.0f), _indicator.getRotation());
 	}
 	*/
-	_worm.render(_movement, _sprites);
+	
 
+	_worm.render(_movement, _sprites);
 	_ship.render(_shipMovement, _sprites);
+
+	_hexagon.render(_hexagonMovement, _sprites);
 
 	_sprites->flush();
 }

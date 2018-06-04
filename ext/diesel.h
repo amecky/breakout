@@ -4988,7 +4988,7 @@ namespace ds {
 		return addResource(res, RT_GEOMETRY_SHADER, name);
 	}
 
-	static RID createShader(const ShaderInfo& info, const char* name) {
+	static RID createShaderInternal(const ShaderInfo& info, const char* name) {
 		if (info.csoName == 0) {
 			if (info.type == ST_VERTEX_SHADER) {
 				return createVertexShader(info.data,info.dataSize, name);
@@ -5021,7 +5021,7 @@ namespace ds {
 	}
 
 	RID createShader(const ShaderDesc& desc, const char* name) {
-		return createShader(desc.getInfo(), name);
+		return createShaderInternal(desc.getInfo(), name);
 	}
 
 	// ------------------------------------------------------

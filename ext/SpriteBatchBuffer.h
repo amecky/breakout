@@ -21,6 +21,9 @@ struct SpriteBatchBufferInfo {
 	RID textureID;
 	ds::TextureFilters textureFilter;
 	RID blendState;
+	RID vertexShader;
+	RID pixelShader;
+	RID constantBuffer;
 };
 
 class SpriteBatchDesc {
@@ -31,6 +34,9 @@ public:
 		_info.textureID = NO_RID;
 		_info.textureFilter = ds::TextureFilters::LINEAR;
 		_info.blendState = NO_RID;
+		_info.pixelShader = NO_RID;
+		_info.vertexShader = NO_RID;
+		_info.constantBuffer = NO_RID;
 	}
 	SpriteBatchDesc& MaxSprites(int max) {
 		_info.maxSprites = max;
@@ -46,6 +52,18 @@ public:
 	}
 	SpriteBatchDesc& BlendState(RID blendState) {
 		_info.blendState = blendState;
+		return *this;
+	}
+	SpriteBatchDesc& PixelShader(RID pixelShader) {
+		_info.pixelShader = pixelShader;
+		return *this;
+	}
+	SpriteBatchDesc& VertexShader(RID vertexShader) {
+		_info.vertexShader = vertexShader;
+		return *this;
+	}
+	SpriteBatchDesc& ConstantBuffer(RID constantBuffer) {
+		_info.constantBuffer = constantBuffer;
 		return *this;
 	}
 	const SpriteBatchBufferInfo& getInfo() const {
@@ -373,11 +391,24 @@ SpriteBatchBuffer::SpriteBatchBuffer(const SpriteBatchDesc& desc) : _current(0) 
 	ds::vec2 textureSize = ds::getTextureSize(info.textureID);
 	_constantBuffer.screenCenter = { static_cast<float>(ds::getScreenWidth()) / 2.0f, static_cast<float>(ds::getScreenHeight()) / 2.0f, textureSize.x, textureSize.y };
 
-	ds::ShaderInfo vsInfo = { 0 , Sprites_VS_Main, sizeof(Sprites_VS_Main), ds::ShaderType::ST_VERTEX_SHADER };
-	RID vertexShader = ds::createShader(vsInfo, "SpritesVS");
-	ds::ShaderInfo psInfo = { 0 , Sprites_PS_Main, sizeof(Sprites_PS_Main), ds::ShaderType::ST_PIXEL_SHADER };
-	RID pixelShader = ds::createShader(psInfo, "SpritesPS");
-
+	RID vertexShader = info.vertexShader;
+	if (vertexShader == NO_RID) {
+		vertexShader = ds::createShader(ds::ShaderDesc()
+			.Data(Sprites_VS_Main)
+			.DataSize(sizeof(Sprites_VS_Main))
+			.ShaderType(ds::ShaderType::ST_VERTEX_SHADER)
+		, "SpritesVS"
+		);
+	}
+	RID pixelShader = info.pixelShader;
+	if (pixelShader == NO_RID) {
+		pixelShader = ds::createShader(ds::ShaderDesc()
+			.Data(Sprites_PS_Main)
+			.DataSize(sizeof(Sprites_PS_Main))
+			.ShaderType(ds::ShaderType::ST_PIXEL_SHADER)
+		, "SpritesPS"
+		);
+	}
 	RID bs_id = info.blendState;
 	if (bs_id == NO_RID) {
 		bs_id = ds::createBlendState(ds::BlendStateDesc()
@@ -388,8 +419,10 @@ SpriteBatchBuffer::SpriteBatchBuffer(const SpriteBatchDesc& desc) : _current(0) 
 			.AlphaEnabled(true)
 		);
 	}
-	RID constantBuffer = ds::createConstantBuffer(sizeof(SpriteBatchConstantBuffer), &_constantBuffer);
-
+	RID constantBuffer = info.constantBuffer;
+	if (constantBuffer == NO_RID) {
+		constantBuffer = ds::createConstantBuffer(sizeof(SpriteBatchConstantBuffer), &_constantBuffer);
+	}
 	RID ssid = createSamplerState(ds::SamplerStateDesc()
 		.AddressMode(ds::TextureAddressModes::CLAMP)
 		.Filter(info.textureFilter)

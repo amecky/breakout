@@ -41,6 +41,7 @@ public:
 			_segments[i].timer += dt;
 		}
 	}
+	virtual void update(float dt) {}
 	int add();
 	int remove(int index);
 protected:
@@ -54,9 +55,14 @@ class Ship : public Enemy {
 
 public:
 	Ship();
-	//void render(const Transformation& movement, SpriteBatchBuffer* sprites);
-private:
+	void update(float dt);
+};
 
+class Hexagon : public Enemy {
+
+public:
+	Hexagon();
+	//void update(float dt);
 };
 
 

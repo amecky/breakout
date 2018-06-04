@@ -68,6 +68,20 @@ Ship::Ship() {
 	}
 }
 
+void Ship::update(float dt) {
+	ds::vec2 p(0.0f);
+	float start = ds::PI * 0.25f;
+	float step = ds::PI / 7.0f * 1.5f;
+	float angle = start;
+	for (int i = 0; i < 8; ++i) {
+		float r = 20.0f + sin(_segments[i].timer) * 5.0f;
+		ds::vec2 np = add_radial(p, angle, r);
+		_segments[i*3].pos = np;
+		_segments[i*3+1].pos = np;
+		_segments[i*3+2].pos = np;
+		angle += step;
+	}
+}
 
 void Enemy::render(const Transformation & movement, SpriteBatchBuffer * sprites) {
 	ds::vec2 p = movement.pos;
@@ -96,4 +110,14 @@ int Enemy::remove(int index) {
 		return _num;
 	}
 	return -1;
+}
+
+Hexagon::Hexagon() {
+	for (int i = 0; i < 6; ++i) {
+		float angle = ds::TWO_PI * static_cast<float>(i) / 6.0f;
+		float size = 20.0f;
+		ds::vec2 np(cosf(angle), sinf(angle));
+		np *= size;
+		_segments[_num++] = { np, 0.0f, ds::vec2(0.5f, 0.5f), ds::Color(49, 237, 191, 255), -1 };
+	}
 }
