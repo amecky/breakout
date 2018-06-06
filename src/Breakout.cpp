@@ -209,6 +209,13 @@ void Breakout::initialize() {
 	_moveXId = _expressionManager.parse(_moveXStr);
 	float v = _expressionManager.run(_moveXId);
 	DBG_LOG("RESULT %3.2f", v);
+
+	for (int i = 0; i < 64; ++i) {
+		MetaBall& b = _balls[i];
+		b.pos = ds::vec2(ds::random(100, 900), ds::random(100, 600));
+		b.velocity = ds::vec2(cosf(ds::random(0, ds::TWO_PI)), sinf(ds::random(0, ds::TWO_PI))) * ds::random(20.0f,80.0f);
+		b.scale = ds::vec2(ds::random(0.5f, 1.5f));
+	}
 }
 
 // -------------------------------------------------------
@@ -328,6 +335,18 @@ void Breakout::update(float dt) {
 	
 	_ship.tick(dt);
 	_ship.update(dt);
+
+	for (int i = 0; i < 64; ++i) {
+		MetaBall& b = _balls[i];
+		b.pos += b.velocity * dt;
+		if (b.pos.x < 10 || b.pos.x > 1000) {
+			b.velocity.x *= -1.0f;
+		}
+		if (b.pos.y < 10 || b.pos.y > 700) {
+			b.velocity.y *= -1.0f;
+		}
+	}
+
 }
 
 void Breakout::render() {
@@ -335,9 +354,14 @@ void Breakout::render() {
 	// http://twvideo01.ubm-us.net/o1/vault/gdc2015/presentations/ViktorLidholt_Advanced_Visual_Effects_in_2D_Games.pdf
 
 	_enemySprites->begin();
-	
-	_enemySprites->add(ds::vec2(512,180), ds::vec4(0, 600, 120, 120));
 
+	for (int i = 0; i < 64; ++i) {
+		const MetaBall& b = _balls[i];
+		float u = 100.0f * b.scale.x;
+		float v = 100.0f * b.scale.y;
+		_enemySprites->add(b.pos, ds::vec4(0.0f, 0.0f, u, v), ds::vec2(1.0f), 0.0f, ds::Color(255, 0, 0, 255));
+	}
+	
 	_enemySprites->flush();
 
 

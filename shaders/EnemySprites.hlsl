@@ -39,10 +39,10 @@ PS_Input VS_Main(uint id:SV_VERTEXID) {
 	float height = ret.w / screenDimension.w;
 	float u2 = u1 + width;
 	float v2 = v1 + height;
-	t[0] = float2(u1, v1);
-	t[1] = float2(u2, v1);
-	t[2] = float2(u1, v2);
-	t[3] = float2(u2, v2);
+	t[0] = float2(0, 0);
+	t[1] = float2(1, 0);
+	t[2] = float2(0, 1);
+	t[3] = float2(1, 1);
 
 	float3 position;
 	position.x = (vertexIndex % 2) ? 0.5 : -0.5;
@@ -87,7 +87,22 @@ float4 PS_Main(PS_Input frag) : SV_TARGET{
 
 
 	//c.rgb *= c.a;
+	float2 cp = 2.0 * frag.tex0 - 1.0;
 
-	return colorMap.Sample(colorSampler, frag.tex0 + refractOffset) * frag.color;
+	float r = sqrt(cp.x * cp.x + cp.y * cp.y);
+	float4 ret = float4(0,0,0,0);//frag.color;
+	if ( r <= 0.3) {
+		ret.a = 1.0 - 3.0 * r * r;
+		ret.g = (1.0 - r / 0.3) * 0.75;
+	}
+	else if ( r < 1 ){
+		ret.a = 3.0/2.0 *(1.0 - r)*(1.0 - r);
+	}
+	else {
+		ret.a = 0;
+	}
+	ret.r = 1.0 - r;//ret.a;
+	return ret;
+	//return colorMap.Sample(colorSampler, frag.tex0 + refractOffset) * frag.color;
 	//return float4(refractOffset.r,refractOffset.g,0,1);
 }

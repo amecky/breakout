@@ -28,6 +28,12 @@ struct EnemySpriteBatchConstantBuffer {
 	ds::vec4 data;
 };
 
+struct MetaBall {
+	ds::vec2 pos;
+	ds::vec2 velocity;
+	ds::vec2 scale;
+};
+
 
 class Breakout : public ds::BaseApp {
 
@@ -69,4 +75,6 @@ private:
 	int _moveYId;
 	char _moveXStr[128];
 	char _moveYStr[128];
+
+	MetaBall _balls[64];
 };
