@@ -24,6 +24,9 @@
     <ClCompile Include="src\utils\ExpressionManager.cpp">
       <Filter>utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\objects\Metaballs.cpp">
+      <Filter>objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -90,6 +93,9 @@
     </ClInclude>
     <ClInclude Include="src\utils\ExpressionManager.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="src\objects\Metaballs.h">
+      <Filter>objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -232,6 +232,7 @@
     <ClCompile Include="src\objects\Ball.cpp" />
     <ClCompile Include="src\objects\Bricks.cpp" />
     <ClCompile Include="src\objects\DirectionIndicator.cpp" />
+    <ClCompile Include="src\objects\Metaballs.cpp" />
     <ClCompile Include="src\objects\Worm.cpp" />
     <ClCompile Include="src\scenes\MainScene.cpp" />
     <ClCompile Include="src\utils\ExpressionManager.cpp" />
@@ -257,6 +258,7 @@
     <ClInclude Include="src\objects\Ball.h" />
     <ClInclude Include="src\objects\Bricks.h" />
     <ClInclude Include="src\objects\DirectionIndicator.h" />
+    <ClInclude Include="src\objects\Metaballs.h" />
     <ClInclude Include="src\objects\Worm.h" />
     <ClInclude Include="src\scenes\MainScene.h" />
     <ClInclude Include="src\utils\ExpressionManager.h" />

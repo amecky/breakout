@@ -112,12 +112,55 @@ int Enemy::remove(int index) {
 	return -1;
 }
 
-Hexagon::Hexagon() {
+void Hexagon::init() {
 	for (int i = 0; i < 6; ++i) {
 		float angle = ds::TWO_PI * static_cast<float>(i) / 6.0f;
-		float size = 20.0f;
+		float size = 40.0f;
 		ds::vec2 np(cosf(angle), sinf(angle));
 		np *= size;
 		_segments[_num++] = { np, 0.0f, ds::vec2(0.5f, 0.5f), ds::Color(49, 237, 191, 255), -1 };
+	}
+
+	for (int i = 0; i < 6; ++i) {
+		const Segment& f = _segments[i];
+		int next = i + 1;
+		if (next == 6) {
+			next = 0;
+		}
+		const Segment& s = _segments[next];
+		ds::vec2 np = (f.pos + s.pos) * 0.5f;
+		ds::vec2 d = s.pos - f.pos;
+		float l = length(d);
+		float sc = l / 48.0f;
+		float angle = math::get_rotation(d);
+		_segments[_num++] = { np, angle, ds::vec2(sc, 0.25f), ds::Color(255, 32, 91, 255), -1 };
+	}
+}
+
+void Shape::init(int num) {
+	for (int i = 0; i < num; ++i) {
+		float angle = ds::TWO_PI * static_cast<float>(i) / static_cast<float>(num);
+		float size = 40.0f;
+		ds::vec2 np(cosf(angle), sinf(angle));
+		np *= size;
+		_segments[_num++] = { np, 0.0f, ds::vec2(0.5f, 0.5f), ds::Color(49, 237, 191, 255), -1 };
+	}
+	
+	_pieces = num;
+
+	for (int i = 0; i < num; ++i) {
+		const Segment& f = _segments[i];
+		int next = i + 1;
+		if (next == num) {
+			next = 0;
+		}
+		const Segment& s = _segments[next];
+		ds::vec2 np = (f.pos + s.pos) * 0.5f;
+		ds::vec2 d = s.pos - f.pos;
+		float l = length(d);
+		float sc = l / 48.0f;
+		sc += sc * 0.2f;
+		float angle = math::get_rotation(d);
+		_segments[_num++] = { np, angle, ds::vec2(sc, 0.25f), ds::Color(255, 32, 91, 255), -1 };
 	}
 }

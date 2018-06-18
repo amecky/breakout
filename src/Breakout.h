@@ -5,6 +5,7 @@
 #include "objects\DirectionIndicator.h"
 #include "objects\Bricks.h"
 #include "objects\Worm.h"
+#include "objects\Metaballs.h"
 #include "utils\ExpressionManager.h"
 
 struct GameContext;
@@ -22,17 +23,8 @@ struct Paddle {
 	float timer;
 };
 
-struct EnemySpriteBatchConstantBuffer {
-	ds::vec4 screenCenter;
-	ds::matrix wvp;
-	ds::vec4 data;
-};
 
-struct MetaBall {
-	ds::vec2 pos;
-	ds::vec2 velocity;
-	ds::vec2 scale;
-};
+
 
 
 class Breakout : public ds::BaseApp {
@@ -53,8 +45,8 @@ private:
 	bool _mousePressed;
 	bool _rightButtonPressed;
 	SpriteBatchBuffer* _sprites;
-	SpriteBatchBuffer* _enemySprites;
-	EnemySpriteBatchConstantBuffer _enemyConstantBuffer;
+	
+	
 	Paddle _paddle;
 	Ball _ball;
 	Bricks _bricks;
@@ -62,10 +54,12 @@ private:
 	Transformation _movement;
 	Transformation _shipMovement;
 	Transformation _hexagonMovement;
+	Transformation _shapeMovement;
 	Hexagon _hexagon;
 	MoveDesc _desc;
 	Worm _worm;
 	Ship _ship;
+	Shape _shape;
 	bool _dbgFollow;
 	float _dbgRelaxation;
 	float _dbgMinDist;
@@ -76,5 +70,5 @@ private:
 	char _moveXStr[128];
 	char _moveYStr[128];
 
-	MetaBall _balls[64];
+	Metaballs* _metaBalls;
 };

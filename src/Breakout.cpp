@@ -3,8 +3,7 @@
 #include "lib\math.h"
 #include "lib\AABBox.h"
 #include <ds_intersection.h>
-#include <EnemySprites_VS_Main.h>
-#include <EnemySprites_PS_Main.h>
+
 
 static void testMove(Transformation* transformation, float dt) {
 	transformation->timer += dt;
@@ -63,11 +62,15 @@ Breakout::Breakout() : ds::BaseApp() {
 }
 
 Breakout::~Breakout() {
+	delete _metaBalls;
 	delete _sprites;
 }
 
 void Breakout::initialize() {
+
 	RID textureID = loadImageFromFile("content\\textures\\TextureArray.png");
+
+	_metaBalls = new Metaballs(textureID);
 
 	RID blendState = ds::createBlendState(ds::BlendStateDesc()
 		.SrcBlend(ds::BlendStates::SRC_ALPHA)
@@ -81,47 +84,6 @@ void Breakout::initialize() {
 		.MaxSprites(2048)
 		.Texture(textureID)
 		.BlendState(blendState)
-	);
-
-	RID vertexShader = ds::createShader(ds::ShaderDesc()
-		.Data(EnemySprites_VS_Main)
-		.DataSize(sizeof(EnemySprites_VS_Main))
-		.ShaderType(ds::ShaderType::ST_VERTEX_SHADER)
-	);
-	RID pixelShader = ds::createShader(ds::ShaderDesc()
-		.Data(EnemySprites_PS_Main)
-		.DataSize(sizeof(EnemySprites_PS_Main))
-		.ShaderType(ds::ShaderType::ST_PIXEL_SHADER)
-	);
-
-	_enemyConstantBuffer.screenCenter = { static_cast<float>(ds::getScreenWidth()) / 2.0f, static_cast<float>(ds::getScreenHeight()) / 2.0f, 1024.0f,1024.0f };
-	_enemyConstantBuffer.data = ds::vec4(0.0f);
-
-	ds::matrix orthoView = ds::matIdentity();
-	ds::matrix orthoProjection = ds::matOrthoLH(1024.0f, 768.0f, 0.1f, 1.0f);
-	ds::Camera camera = {
-		orthoView,
-		orthoProjection,
-		orthoView * orthoProjection,
-		ds::vec3(0,0,0),
-		ds::vec3(0,0,0),
-		ds::vec3(0,1,0),
-		ds::vec3(1,0,0),
-		0.0f,
-		0.0f,
-		0.0f
-	};
-
-	_enemyConstantBuffer.wvp = ds::matTranspose(camera.viewProjectionMatrix);
-	RID constantBuffer = ds::createConstantBuffer(sizeof(EnemySpriteBatchConstantBuffer), &_enemyConstantBuffer);
-
-	_enemySprites = new SpriteBatchBuffer(SpriteBatchDesc()
-		.MaxSprites(2048)
-		.Texture(textureID)
-		.BlendState(blendState)
-		.PixelShader(pixelShader)
-		.VertexShader(vertexShader)
-		.ConstantBuffer(constantBuffer)
 	);
 
 	_paddle.position = ds::vec2(512, 80);
@@ -196,6 +158,10 @@ void Breakout::initialize() {
 	_hexagonMovement.previous = _hexagonMovement.pos;
 	_hexagonMovement.timer = 0.0f;
 
+	_shapeMovement.pos = ds::vec2(400, 250);
+	_shapeMovement.previous = _shapeMovement.pos;
+	_shapeMovement.timer = 0.0f;
+
 	testMove(&_movement, 0.0f);
 	
 	_dbgRelaxation = 0.2f;
@@ -210,12 +176,9 @@ void Breakout::initialize() {
 	float v = _expressionManager.run(_moveXId);
 	DBG_LOG("RESULT %3.2f", v);
 
-	for (int i = 0; i < 64; ++i) {
-		MetaBall& b = _balls[i];
-		b.pos = ds::vec2(ds::random(100, 900), ds::random(100, 600));
-		b.velocity = ds::vec2(cosf(ds::random(0, ds::TWO_PI)), sinf(ds::random(0, ds::TWO_PI))) * ds::random(20.0f,80.0f);
-		b.scale = ds::vec2(ds::random(0.5f, 1.5f));
-	}
+	_hexagon.init();
+	_shape.init(7);
+
 }
 
 // -------------------------------------------------------
@@ -223,7 +186,7 @@ void Breakout::initialize() {
 // -------------------------------------------------------
 void Breakout::update(float dt) {
 
-	_enemyConstantBuffer.data.x += dt;
+	
 
 	handleButtons();
 
@@ -336,35 +299,15 @@ void Breakout::update(float dt) {
 	_ship.tick(dt);
 	_ship.update(dt);
 
-	for (int i = 0; i < 64; ++i) {
-		MetaBall& b = _balls[i];
-		b.pos += b.velocity * dt;
-		if (b.pos.x < 10 || b.pos.x > 1000) {
-			b.velocity.x *= -1.0f;
-		}
-		if (b.pos.y < 10 || b.pos.y > 700) {
-			b.velocity.y *= -1.0f;
-		}
-	}
+	_metaBalls->move(dt);
 
 }
 
 void Breakout::render() {
 
 	// http://twvideo01.ubm-us.net/o1/vault/gdc2015/presentations/ViktorLidholt_Advanced_Visual_Effects_in_2D_Games.pdf
-
-	_enemySprites->begin();
-
-	for (int i = 0; i < 64; ++i) {
-		const MetaBall& b = _balls[i];
-		float u = 100.0f * b.scale.x;
-		float v = 100.0f * b.scale.y;
-		_enemySprites->add(b.pos, ds::vec4(0.0f, 0.0f, u, v), ds::vec2(1.0f), 0.0f, ds::Color(255, 0, 0, 255));
-	}
+	_metaBalls->render();
 	
-	_enemySprites->flush();
-
-
 	_sprites->begin();
 	/*
 	_sprites->add(_paddle.position, _paddle.texture);
@@ -377,9 +320,12 @@ void Breakout::render() {
 	
 
 	_worm.render(_movement, _sprites);
+
 	_ship.render(_shipMovement, _sprites);
 
 	_hexagon.render(_hexagonMovement, _sprites);
+
+	_shape.render(_shapeMovement, _sprites);
 
 	_sprites->flush();
 }

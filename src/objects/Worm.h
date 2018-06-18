@@ -61,10 +61,22 @@ public:
 class Hexagon : public Enemy {
 
 public:
-	Hexagon();
-	//void update(float dt);
+	Hexagon() {}
+	void init();
 };
 
+
+class Shape : public Enemy {
+
+public:
+	Shape() : _pieces(0) {}
+	void init(int num);
+	int numPieces() const {
+		return _pieces;
+	}
+private:
+	int _pieces;
+};
 
 
 class Worm {
