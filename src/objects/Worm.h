@@ -22,6 +22,19 @@ struct Segment {
 	int expressionId;
 };
 
+struct EnemyDesc {
+	Segment segments[64];
+	int num;
+	Transformation transformation;	
+};
+
+namespace enemies {
+
+	void render(const EnemyDesc& desc, SpriteBatchBuffer* sprites);
+
+	void build_shape(EnemyDesc* desc, int num);
+}
+
 class Enemy {
 
 public:
@@ -47,6 +60,7 @@ public:
 protected:
 	int _num;
 	Segment _segments[32];
+	Transformation _transformation;
 private:
 
 };

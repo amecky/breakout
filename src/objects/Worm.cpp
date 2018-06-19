@@ -6,6 +6,66 @@ static ds::vec2 add_radial(const ds::vec2& pos, float angle, float radius) {
 	return pos + radius * ds::vec2(cosf(angle), sinf(angle));
 }
 
+ds::matrix srt(float scale, float rotation, float x, float y) {
+	float ca = cos(rotation);
+	float sa = sin(rotation);
+	ds::matrix m = ds::matIdentity();
+	m._11 = scale * ca;
+	m._12 = scale * sa;
+	m._13 = x;
+	m._21 = scale * -sa;
+	m._22 = scale * ca;
+	m._23 = y;
+	return m;
+}
+
+namespace enemies {
+
+	void render(const EnemyDesc& desc, SpriteBatchBuffer * sprites) {
+		ds::vec2 p = desc.transformation.pos;
+		//ds::matrix world = srt(desc.transformation.scale.x, desc.transformation.rotation, desc.transformation.pos.x, desc.transformation.pos.y);
+		//ds::vec3 tmp = world * ds::vec3(p);
+		for (int i = 0; i < desc.num; ++i) {
+			const Segment& s = desc.segments[i];
+			sprites->add(p + s.pos, ds::vec4(480, 0, 48, 48), s.scale, s.rotation, s.color);
+			//sprites->add(s.pos + ds::vec2(tmp.x,tmp.y), ds::vec4(480, 0, 48, 48), s.scale, s.rotation, s.color);
+		}
+	}
+
+	void build_shape(EnemyDesc* desc, int num) {
+		desc->num = 0;
+		desc->transformation.pos = ds::vec2(0.0f);
+		desc->transformation.previous = desc->transformation.pos;
+		desc->transformation.rotation = 0.0f;
+		desc->transformation.scale = ds::vec2(1.0f);
+		desc->transformation.timer = 0.0f;
+		for (int i = 0; i < num; ++i) {
+			float angle = ds::TWO_PI * static_cast<float>(i) / static_cast<float>(num);
+			float size = 40.0f;
+			ds::vec2 np(cosf(angle), sinf(angle));
+			np *= size;
+			desc->segments[desc->num++] = { np, 0.0f, ds::vec2(0.5f, 0.5f), ds::Color(49, 237, 191, 255), -1 };
+		}
+
+		for (int i = 0; i < num; ++i) {
+			const Segment& f = desc->segments[i];
+			int next = i + 1;
+			if (next == num) {
+				next = 0;
+			}
+			const Segment& s = desc->segments[next];
+			ds::vec2 np = (f.pos + s.pos) * 0.5f;
+			ds::vec2 d = s.pos - f.pos;
+			float l = length(d);
+			float sc = l / 48.0f;
+			sc += sc * 0.2f;
+			float angle = math::get_rotation(d);
+			desc->segments[desc->num++] = { np, angle, ds::vec2(sc, 0.25f), ds::Color(255, 32, 91, 255), -1 };
+		}
+	}
+
+}
+
 Worm::Worm() {
 	ds::vec2 pos = ds::vec2(512, 384);
 	for (int i = 0; i < NUM_SEGMENTS; ++i) {

@@ -51,14 +51,17 @@ Breakout::Breakout() : ds::BaseApp() {
 	_buttonPressed[0] = false;
 	_buttonPressed[1] = false;
 	_dbgFollow = false;
-
+	_dbgShowMetaBalls = false;
 	_settings.guiSettings = ds::GUIDesc()
 		.Enabled(true)
 		.SideMenuEnabled(true)
 		.SideMenuPosition(p2i(650, 750))
-		.BottomMenuEnabled(true)
+		.BottomMenuEnabled(false)
 		.BottomMenuPosition(p2i(10, 80))
 		.getSettings();
+
+	_numEnemies = 0;
+	_dbgShapes = 3;
 }
 
 Breakout::~Breakout() {
@@ -154,13 +157,9 @@ void Breakout::initialize() {
 	_shipMovement.previous = _movement.pos;
 	_shipMovement.timer = 0.0f;
 
-	_hexagonMovement.pos = ds::vec2(200, 600);
-	_hexagonMovement.previous = _hexagonMovement.pos;
-	_hexagonMovement.timer = 0.0f;
+	addShapes(6);
 
-	_shapeMovement.pos = ds::vec2(400, 250);
-	_shapeMovement.previous = _shapeMovement.pos;
-	_shapeMovement.timer = 0.0f;
+	addShapes(5);
 
 	testMove(&_movement, 0.0f);
 	
@@ -176,17 +175,12 @@ void Breakout::initialize() {
 	float v = _expressionManager.run(_moveXId);
 	DBG_LOG("RESULT %3.2f", v);
 
-	_hexagon.init();
-	_shape.init(7);
-
 }
 
 // -------------------------------------------------------
 // Update
 // -------------------------------------------------------
 void Breakout::update(float dt) {
-
-	
 
 	handleButtons();
 
@@ -298,16 +292,29 @@ void Breakout::update(float dt) {
 	
 	_ship.tick(dt);
 	_ship.update(dt);
+	if (_dbgShowMetaBalls) {
+		_metaBalls->move(dt);
+	}
 
-	_metaBalls->move(dt);
+	for (int i = 0; i < _numEnemies; ++i) {
+		EnemyDesc& desc = _descriptors[i];
+		desc.transformation.rotation += dt;
+	}
 
+}
+
+void Breakout::addShapes(int shapes) {
+	EnemyDesc& desc = _descriptors[_numEnemies++];
+	enemies::build_shape(&desc, shapes);
+	desc.transformation.pos = ds::vec2(100.0f) + ds::vec2(ds::random(0.0f, 800.0f), ds::random(0.0f, 500.0f));
 }
 
 void Breakout::render() {
 
 	// http://twvideo01.ubm-us.net/o1/vault/gdc2015/presentations/ViktorLidholt_Advanced_Visual_Effects_in_2D_Games.pdf
-	_metaBalls->render();
-	
+	if (_dbgShowMetaBalls) {
+		_metaBalls->render();
+	}
 	_sprites->begin();
 	/*
 	_sprites->add(_paddle.position, _paddle.texture);
@@ -323,14 +330,20 @@ void Breakout::render() {
 
 	_ship.render(_shipMovement, _sprites);
 
-	_hexagon.render(_hexagonMovement, _sprites);
-
-	_shape.render(_shapeMovement, _sprites);
+	for (int i = 0; i < _numEnemies; ++i) {
+		const EnemyDesc& desc = _descriptors[i];
+		enemies::render(desc, _sprites);
+	}
 
 	_sprites->flush();
 }
 
 void Breakout::drawLeftPanel() {
+	gui::Checkbox("MetaBalls", &_dbgShowMetaBalls);
+	gui::Input("Shapes", &_dbgShapes);
+	if (gui::Button("Add shape")) {
+		addShapes(_dbgShapes);
+	}
 	gui::Value("Angle", (_indicator.getRotation() * 360.0f / ds::TWO_PI));
 	gui::Checkbox("Follow", &_dbgFollow);
 	if (gui::Button("Reset ball")) {
@@ -338,7 +351,7 @@ void Breakout::drawLeftPanel() {
 	}
 	gui::Input("Min dist", &_dbgMinDist);
 	gui::Input("Relaxation", &_dbgRelaxation);
-
+	/*
 	gui::Value("Segments", _ship.num());
 	gui::Slider("Index", &_dbgIndex, 0, _ship.num());
 	if (_dbgIndex != -1) {
@@ -355,6 +368,7 @@ void Breakout::drawLeftPanel() {
 	if (gui::Button("Remove")) {
 		_dbgIndex = _ship.remove(_dbgIndex);
 	}
+	*/
 }
 
 void Breakout::drawBottomPanel() {

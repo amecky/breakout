@@ -38,6 +38,7 @@ public:
 	void drawLeftPanel();
 	void drawBottomPanel();
 private:
+	void addShapes(int shapes);
 	void handleButtons();
 	bool _buttonPressed[2];
 	bool _buttonClicked[2];
@@ -53,13 +54,9 @@ private:
 	DirectionIndicator _indicator;
 	Transformation _movement;
 	Transformation _shipMovement;
-	Transformation _hexagonMovement;
-	Transformation _shapeMovement;
-	Hexagon _hexagon;
 	MoveDesc _desc;
 	Worm _worm;
 	Ship _ship;
-	Shape _shape;
 	bool _dbgFollow;
 	float _dbgRelaxation;
 	float _dbgMinDist;
@@ -71,4 +68,8 @@ private:
 	char _moveYStr[128];
 
 	Metaballs* _metaBalls;
+	bool _dbgShowMetaBalls;
+	EnemyDesc _descriptors[32];
+	int _numEnemies;
+	int _dbgShapes;
 };
