@@ -3,7 +3,7 @@
 #include "lib\math.h"
 #include "lib\AABBox.h"
 #include <ds_intersection.h>
-
+#include "utils\TweakValue.h"
 
 static void testMove(Transformation* transformation, float dt) {
 	transformation->timer += dt;
@@ -161,6 +161,8 @@ void Breakout::initialize() {
 
 	addShapes(5);
 
+	addSineShape(16);
+
 	testMove(&_movement, 0.0f);
 	
 	_dbgRelaxation = 0.2f;
@@ -290,8 +292,6 @@ void Breakout::update(float dt) {
 	_movement.rotation = math::get_rotation(_movement.pos - _movement.previous);
 	_worm.move(_movement, dt, _dbgMinDist, _dbgRelaxation);
 	
-	_ship.tick(dt);
-	_ship.update(dt);
 	if (_dbgShowMetaBalls) {
 		_metaBalls->move(dt);
 	}
@@ -301,12 +301,25 @@ void Breakout::update(float dt) {
 		desc.transformation.rotation += dt;
 	}
 
+	ReloadChangedTweakableValues();
 }
 
 void Breakout::addShapes(int shapes) {
 	EnemyDesc& desc = _descriptors[_numEnemies++];
 	enemies::build_shape(&desc, shapes);
 	desc.transformation.pos = ds::vec2(100.0f) + ds::vec2(ds::random(0.0f, 800.0f), ds::random(0.0f, 500.0f));
+}
+
+void Breakout::addSineShape(int shapes) {
+	EnemyDesc& desc = _descriptors[_numEnemies++];
+	ds::vec2 p[16];
+	for (int i = 0; i < 16; ++i) {
+		float a = ds::TWO_PI / 16.0f * static_cast<float>(i);
+		p[i] = ds::vec2(-160.0f  + static_cast<float>(i) * 20.0f, sinf(a) * 40.0f);
+	}
+	enemies::build_shape(&desc, p, 16);
+	enemies::connect_segments(&desc, shapes, false);
+	desc.transformation.pos = ds::vec2(200, 300);// ds::vec2(100.0f) + ds::vec2(ds::random(0.0f, 800.0f), ds::random(0.0f, 500.0f));
 }
 
 void Breakout::render() {
@@ -326,9 +339,9 @@ void Breakout::render() {
 	*/
 	
 
-	_worm.render(_movement, _sprites);
+	//_worm.render(_movement, _sprites);
 
-	_ship.render(_shipMovement, _sprites);
+	//_ship.render(_shipMovement, _sprites);
 
 	for (int i = 0; i < _numEnemies; ++i) {
 		const EnemyDesc& desc = _descriptors[i];

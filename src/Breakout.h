@@ -23,10 +23,6 @@ struct Paddle {
 	float timer;
 };
 
-
-
-
-
 class Breakout : public ds::BaseApp {
 
 public:	
@@ -39,6 +35,7 @@ public:
 	void drawBottomPanel();
 private:
 	void addShapes(int shapes);
+	void addSineShape(int shapes);
 	void handleButtons();
 	bool _buttonPressed[2];
 	bool _buttonClicked[2];
@@ -56,7 +53,6 @@ private:
 	Transformation _shipMovement;
 	MoveDesc _desc;
 	Worm _worm;
-	Ship _ship;
 	bool _dbgFollow;
 	float _dbgRelaxation;
 	float _dbgMinDist;

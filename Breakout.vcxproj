@@ -236,6 +236,7 @@
     <ClCompile Include="src\objects\Worm.cpp" />
     <ClCompile Include="src\scenes\MainScene.cpp" />
     <ClCompile Include="src\utils\ExpressionManager.cpp" />
+    <ClCompile Include="src\utils\TweakValue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\diesel.h" />
@@ -262,6 +263,7 @@
     <ClInclude Include="src\objects\Worm.h" />
     <ClInclude Include="src\scenes\MainScene.h" />
     <ClInclude Include="src\utils\ExpressionManager.h" />
+    <ClInclude Include="src\utils\TweakValue.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Breakout.manifest" />

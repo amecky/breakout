@@ -27,6 +27,9 @@
     <ClCompile Include="src\objects\Metaballs.cpp">
       <Filter>objects</Filter>
     </ClCompile>
+    <ClCompile Include="src\utils\TweakValue.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -96,6 +99,9 @@
     </ClInclude>
     <ClInclude Include="src\objects\Metaballs.h">
       <Filter>objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\TweakValue.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
